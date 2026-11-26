@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from services.math_verifier import verify
-from services.ollama_client import generate_tutor_response
+from services.ollama_client import TutorUnavailableError, generate_tutor_response
 
 router = APIRouter(prefix="/api/tutor", tags=["tutor"])
 
@@ -20,9 +20,16 @@ class TutorResponse(BaseModel):
     verification_note: str
 
 
-@router.post("/ask", response_model=TutorResponse)
+@router.post(
+    "/ask",
+    response_model=TutorResponse,
+    responses={503: {"description": "The local AI model is not running or not installed"}},
+)
 async def ask_tutor(req: TutorRequest):
-    explanation = generate_tutor_response(req.question, req.grade)
+    try:
+        explanation = generate_tutor_response(req.question, req.grade)
+    except TutorUnavailableError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
     result = verify(req.question, explanation)
     return TutorResponse(
         explanation=explanation,
