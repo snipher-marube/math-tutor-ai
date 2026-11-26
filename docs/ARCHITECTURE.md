@@ -35,7 +35,7 @@ A teaching engine written in code drives learning. The small AI model is a helpe
 | Component | Responsibility | Status |
 | --- | --- | --- |
 | Skill map | Ordered skills per CBE sub-strand, with prerequisites, stored as data files teachers can review | Built: `skills/*.yaml`, `services/skill_map.py` ([SKILLS.md](SKILLS.md)) |
-| Problem generator | Creates problems for a skill. The correct answer is computed in code | Planned (v0.3) |
+| Problem generator | Creates problems for a skill. The correct answer is computed in code | Built: `services/problems.py` |
 | Answer checker | Marks answers and recognises common misconceptions | Planned (v0.3) |
 | Hint ladder | Nudge, then picture, then worked example, then a new try | Planned (v0.3) |
 | Learner progress | Mastery per skill and review schedule, stored locally in SQLite | Planned (v0.3) |
@@ -68,6 +68,7 @@ Today the backend provides the free-question mode only. The frontend is still th
 | `services/ollama_client.py` | Builds the system prompt and calls the local model through Ollama, with timeout and error handling |
 | `services/math_verifier.py` | Works out the answer to simple arithmetic questions in code and checks the model's answer |
 | `services/skill_map.py` | Loads and checks the skill map in `skills/*.yaml`. Not used by an endpoint yet |
+| `services/problems.py` | One problem generator per skill. Answers are computed in code. Not used by an endpoint yet |
 | `skills/` | Skill map data files, one per CBE sub-strand ([SKILLS.md](SKILLS.md)) |
 | `tests/` | Pytest suite. The model is always faked |
 
