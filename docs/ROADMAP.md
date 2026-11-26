@@ -8,7 +8,7 @@ This is a living plan. Each item should become a GitHub issue. Items marked 🟢
 - [x] 🟢 Backend: return a friendly `503` when Ollama is unreachable, instead of a 500
 - [x] 🟢 Backend: use `ollama.AsyncClient` so requests don't block the event loop
 - [x] 🟢 Backend: configurable `OLLAMA_TIMEOUT` that returns a friendly `504`
-- [ ] 🟢 Validate input: limit question length and reject empty strings
+- [x] 🟢 Validate input: limit question length and reject empty strings
 - [ ] Move the system prompt into its own file (`backend/prompts/`) so non-developers can edit it
 
 ## v0.3: Correctness and curriculum
