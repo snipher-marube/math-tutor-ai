@@ -27,7 +27,13 @@ def test_ask_returns_explanation(monkeypatch):
     monkeypatch.setattr(routers.tutor, "generate_tutor_response", fake_generate)
     res = client.post("/api/tutor/ask", json={"question": "What is 2 + 3?"})
     assert res.status_code == 200
-    assert res.json() == {"explanation": "Grade 2: 2 + 3 = 5"}
+    assert res.json() == {
+        "explanation": "Grade 2: 2 + 3 = 5",
+        "model_answer": 5.0,
+        "correct_answer": 5.0,
+        "is_correct": True,
+        "verification_note": "ok",
+    }
 
 
 def test_ask_requires_question():

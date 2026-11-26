@@ -1,13 +1,16 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from services.ollama_client import generate_tutor_response
+
 from services.math_verifier import verify
+from services.ollama_client import generate_tutor_response
 
 router = APIRouter(prefix="/api/tutor", tags=["tutor"])
+
 
 class TutorRequest(BaseModel):
     question: str
     grade: int = 2
+
 
 class TutorResponse(BaseModel):
     explanation: str
@@ -15,6 +18,7 @@ class TutorResponse(BaseModel):
     correct_answer: float | None
     is_correct: bool | None
     verification_note: str
+
 
 @router.post("/ask", response_model=TutorResponse)
 async def ask_tutor(req: TutorRequest):
