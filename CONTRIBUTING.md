@@ -73,7 +73,8 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 - No external fonts, CDNs or remote images. Bundle every asset so the app works offline.
 - Design for children: large touch targets, high contrast, minimal text, and no ads or links to the internet.
 - Never show an answer before the child gives it (for example, keep a number line's `blank` box empty). See [frontend/README.md](frontend/README.md) for the app's structure and rules.
-- There are no frontend tests yet (it's on the roadmap). Check UI changes in a browser, at phone width too, and include screenshots in your PR.
+- Frontend tests use Vitest (`npm test`, or `make test` for everything). Put tests next to the code as `*.test.js`. Pure logic, like `src/lib/speech.js`, should always have tests.
+- Also check UI changes in a browser, at phone width too, and include screenshots in your PR.
 
 ### Teaching engine, skills and misconceptions
 

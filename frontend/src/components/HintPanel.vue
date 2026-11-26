@@ -2,6 +2,8 @@
 // Shows the hint ladder one step at a time: nudge, picture, worked example.
 import { ref, watch } from 'vue'
 import { api } from '../lib/api.js'
+import { releaseFocusAfterPointer } from '../lib/focus.js'
+import { speak } from '../lib/speech.js'
 import ProblemVisual from './ProblemVisual.vue'
 
 const props = defineProps({
@@ -24,6 +26,15 @@ async function load() {
 }
 
 watch(() => [props.problemId, props.start], load, { immediate: true })
+
+// Read each hint aloud as it appears. A worked example is read step by step.
+watch(shown, (n) => {
+  const hint = hints.value[n - 1]
+  if (!hint) return
+  const parts = [hint.text]
+  if (hint.example) parts.push(hint.example.question, ...hint.example.steps)
+  speak(parts.join(' '))
+})
 </script>
 
 <template>
@@ -43,7 +54,13 @@ watch(() => [props.problemId, props.start], load, { immediate: true })
         </ol>
       </div>
     </article>
-    <button v-if="shown < hints.length" type="button" @click="shown++">Show me more help</button>
+    <button
+      v-if="shown < hints.length"
+      type="button"
+      @click="shown++, releaseFocusAfterPointer($event)"
+    >
+      Show me more help
+    </button>
   </section>
 </template>
 

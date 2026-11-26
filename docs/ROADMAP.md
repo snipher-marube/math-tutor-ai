@@ -32,8 +32,10 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] Visual tools: counters, ten-frames, number line, base-ten blocks
 - [ ] Visual tools: Kenyan coins, and tapping or moving counters (not just looking)
 - [x] Hint ladder in the UI
-- [ ] 🟢 Frontend tests (Vitest and Vue Test Utils) for the number pad, visuals and lesson flow
-- [ ] Read-aloud with offline text-to-speech
+- [x] Frontend test setup (Vitest), with tests for read-aloud text and focus handling
+- [ ] 🟢 Component tests (Vue Test Utils) for the number pad, visuals and lesson flow
+- [x] Read-aloud with on-device text-to-speech (question, feedback and hints)
+- [ ] Read-aloud in Kiswahili
 - [ ] Rewards for effort and progress (stars, a skill path)
 - [ ] 🟢 "Ask a question" screen that uses `POST /api/tutor/ask`, with a loading state
 
