@@ -2,33 +2,51 @@
 
 This is a living plan. Each item should become a GitHub issue. Items marked 🟢 are good first issues.
 
-## v0.2: Usable MVP
-- [ ] Child-friendly chat UI in `frontend/` that replaces the Vite starter page (big buttons, large fonts, colourful)
-- [ ] 🟢 Frontend: call `POST /api/tutor/ask` and show a loading state
+The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in code) drives learning, and the **AI model** helps with language. The free-question chat that exists today stays as a secondary "ask a question" mode.
+
+## v0.2: Foundations
+- [x] Project setup, contributor docs and CI
+- [x] Free-question endpoint (`POST /api/tutor/ask`) with answer verification in code
 - [x] 🟢 Backend: return a friendly `503` when Ollama is unreachable, instead of a 500
 - [x] 🟢 Backend: use `ollama.AsyncClient` so requests don't block the event loop
 - [x] 🟢 Backend: configurable `OLLAMA_TIMEOUT` that returns a friendly `504`
 - [x] 🟢 Validate input: limit question length and reject empty strings
+- [x] Document the teaching approach ([PEDAGOGY.md](PEDAGOGY.md)) and widen scope to Grades 1–3
 - [ ] Move the system prompt into its own file (`backend/prompts/`) so non-developers can edit it
 
-## v0.3: Correctness and curriculum
-- [ ] Evaluation set: 100+ Grade 2 questions with answers across all strands (`backend/eval/`)
-- [ ] 🟢 Script to run the eval set against a model and report accuracy
-- [ ] Verify arithmetic answers in Python and correct or flag the model
-- [ ] Practice mode: the tutor generates questions per sub-strand and checks the learner's answers
-- [ ] Hints mode: give a hint first, then the full solution on request
+## v0.3: Teaching engine (no AI needed)
+- [ ] Skill map format (data files) with prerequisites, plus the first skills: Grade 1–2 addition
+- [ ] Problem generator per skill. Every problem has a correct answer computed in code
+- [ ] Answer checker with misconception detection for addition (see the table in [PEDAGOGY.md](PEDAGOGY.md#5-learn-from-wrong-answers-misconceptions))
+- [ ] Hint ladder data per skill: nudge, picture, worked example
+- [ ] Lesson API: `GET` next problem, `POST` answer, `GET` hint
+- [ ] Learner progress stored locally (SQLite), with mastery rules
+- [ ] Placement check to find each learner's starting level
+- [ ] Spaced review of mastered skills
+- [ ] 🟢 Add subtraction skills and misconceptions
+- [ ] 🟢 Add skills for other sub-strands (money, time, shapes, ...)
+
+## v0.4: Child-friendly app
+- [ ] Replace the Vite starter page with the lesson screen: one problem, big number buttons, instant feedback
+- [ ] Visual tools: counters, ten-frames, number line, base-ten blocks, Kenyan coins
+- [ ] Hint ladder in the UI
+- [ ] Read-aloud with offline text-to-speech
+- [ ] Rewards for effort and progress (stars, a skill path)
+- [ ] 🟢 "Ask a question" screen that uses `POST /api/tutor/ask`, with a loading state
+
+## v0.5: AI language layer and reach
+- [ ] AI writes Kenyan word problems from generated sums. Code checks the numbers
+- [ ] AI re-explains in simpler words. Varied, warm feedback
+- [ ] Kiswahili prompts, audio and UI
+- [ ] Teacher and parent view: progress per skill, suggested groups
+- [ ] Evaluation set: 100+ problems with answers across all strands and grades (`backend/eval/`)
+- [ ] 🟢 Script to run the eval set against a model and report how well it follows the rules
 - [ ] Compare small models (qwen2.5 0.5b/1.5b, llama3.2:1b, gemma3:1b) and document the results
 
-## v0.4: Reach
-- [ ] Kiswahili prompts and UI
-- [ ] Text-to-speech for learners who are still learning to read (offline TTS)
-- [ ] Simple local progress tracking per sub-strand (stays on the device)
-- [ ] Teacher or parent view
-
-## v1.0: Deployable
+## v1.0: Deployable and proven
 - [ ] One-command install (Docker Compose and/or packaged installers)
 - [ ] Run on low-cost hardware (Raspberry Pi 5 / old laptops) and document the performance
 - [ ] Serve the built frontend from FastAPI, so there's only one process to run
-- [ ] Field testing with real Grade 2 classrooms and teachers
+- [ ] Field testing in real Grade 1–3 classrooms, with pre- and post-checks per skill
 
 Have an idea? Open a [feature request](https://github.com/snipher-marube/math-tutor-ai/issues/new/choose).

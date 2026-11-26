@@ -15,7 +15,7 @@ Health check for scripts and monitoring.
 ```
 
 ## `POST /api/tutor/ask`
-Ask the tutor a maths question.
+Ask the tutor a free maths question. This is the secondary "ask a question" mode. The main lesson API is planned (see [ROADMAP.md](ROADMAP.md)).
 
 **Request**
 

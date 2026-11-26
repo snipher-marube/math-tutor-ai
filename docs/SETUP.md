@@ -43,7 +43,7 @@ ollama list                # check that it's installed
 
 Ollama runs as a background service on port `11434`. If it isn't running, start it with `ollama serve`.
 
-**Trying other models:** set `OLLAMA_MODEL` in `backend/.env`. Small models worth comparing include `qwen2.5:0.5b` (faster, weaker), `llama3.2:1b` and `gemma3:1b`. If you find one that works better for Grade 2, open an issue with example outputs.
+**Trying other models:** set `OLLAMA_MODEL` in `backend/.env`. Small models worth comparing include `qwen2.5:0.5b` (faster, weaker), `llama3.2:1b` and `gemma3:1b`. If you find one that works better for Lower Primary learners, open an issue with example outputs.
 
 ## 5. Frontend
 

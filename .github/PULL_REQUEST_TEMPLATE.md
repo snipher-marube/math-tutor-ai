@@ -19,5 +19,6 @@
 - [ ] `make lint` and `make test` pass
 - [ ] `make build` passes (if the frontend changed)
 - [ ] Works fully offline (no new calls to internet services)
-- [ ] Content is suitable for a 7–8 year old (see docs/CHILD_SAFETY.md)
+- [ ] Content is suitable for children aged 6–9 (see docs/CHILD_SAFETY.md)
+- [ ] Fits the teaching approach: teaches rather than just answering, and correct answers are computed in code (see docs/PEDAGOGY.md)
 - [ ] Docs updated if behaviour or setup changed

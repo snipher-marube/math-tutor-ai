@@ -1,36 +1,53 @@
 # Math Tutor AI 🇰🇪
 
-**An open-source, offline AI math tutor for Grade 2 learners in Kenya, aligned to the Competency Based Education (CBE) curriculum.**
+**An open-source, offline math tutor that helps Kenyan children in Lower Primary (Grades 1–3) *understand* maths, aligned to the Competency Based Education (CBE) curriculum.**
 
 [![CI](https://github.com/snipher-marube/math-tutor-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/snipher-marube/math-tutor-ai/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-Many Kenyan schools and homes have little or no internet. Math Tutor AI runs a small language model **locally** (through [Ollama](https://ollama.com)), so a learner can get patient, step-by-step help with Grade 2 maths on a modest laptop, with no data bundle and no cloud account.
+Many Kenyan schools and homes have little or no internet. Math Tutor AI runs entirely **on the learner's device**, a modest laptop with no data bundle and no cloud account.
 
-> **Status: early stage (v0.1).** The backend can answer questions with a local model, and the frontend is still the Vite starter page. This is a great time to get involved. See the [Roadmap](docs/ROADMAP.md).
+It isn't just a chatbot. A **teaching engine** written in code decides what each child should learn next, gives problems with answers it has worked out itself, spots the specific mistake a child makes, and gives hints instead of answers. A small local AI model (through [Ollama](https://ollama.com)) helps with the language: child-friendly wording, Kenyan stories and encouragement. Read **[how it teaches](docs/PEDAGOGY.md)**.
+
+> **Status: early stage (v0.2).** Today the backend answers free maths questions with a local model and checks the arithmetic in code. The teaching engine and the child-friendly app are next, and the frontend is still the Vite starter page. This is a great time to get involved. See the [Roadmap](docs/ROADMAP.md).
 
 ---
 
+## How it teaches
+
+| Principle | What it means for a child |
+| --- | --- |
+| 🧭 **Right level, not right grade** | A short placement check finds where they really are, so a Grade 3 child who needs Grade 1 skills starts there |
+| 🪜 **Skill by skill, until mastered** | Small steps (count → add within 10 → make 10 → ...). They move on only once a skill is secure |
+| 🥭 **Objects, then pictures, then numbers** | 5 mangoes + 3 mangoes, then dots on a ten-frame, then `5 + 3 = 8` |
+| 💡 **Hints, not answers** | Nudge, then a picture, then a worked example, then they try again themselves |
+| 🔍 **Learning from mistakes** | `7 + 5 = 75` gets help with what "+" means, not just "wrong" |
+| 🔊 **Works for early readers** | Read-aloud, pictures and big buttons. Kiswahili planned |
+
+Full details: **[docs/PEDAGOGY.md](docs/PEDAGOGY.md)**.
+
 ## Features
 
-- 📴 **Fully offline.** The model runs on the learner's device.
-- 🧒 **Made for 7–8 year olds.** Simple English, short steps, familiar Kenyan examples (mangoes, shillings, matatus).
-- 📚 **CBE-aligned.** Covers the Grade 2 Mathematics strands: Numbers, Measurement and Geometry. See [docs/CURRICULUM.md](docs/CURRICULUM.md).
+- 📴 **Fully offline.** Everything runs on the learner's device.
+- 🧒 **Made for ages 6–9.** Simple language, short sessions, familiar Kenyan examples (mangoes, shillings, matatus).
+- 📚 **CBE-aligned.** Grades 1–3 Mathematics strands: Numbers, Measurement and Geometry. See [docs/CURRICULUM.md](docs/CURRICULUM.md).
+- ✅ **Maths in code.** Correct answers are always calculated in code, never trusted to the AI.
 - 🪶 **Lightweight.** The default model is `qwen2.5:1.5b` (about 1 GB), and you can swap in a different one.
 - 🔌 **Simple API.** A FastAPI backend that any frontend (web, desktop, kiosk) can call.
 
 ## How it works
 
 ```
-┌──────────────┐   HTTP    ┌──────────────────┐   HTTP   ┌──────────────┐
-│ Vue frontend │ ────────▶ │ FastAPI backend  │ ───────▶ │ Ollama + LLM │
-│  :5173       │ ◀──────── │  :8000           │ ◀─────── │  :11434      │
-└──────────────┘   JSON    └──────────────────┘          └──────────────┘
+┌──────────────┐   HTTP    ┌──────────────────────────┐   HTTP   ┌──────────────┐
+│ Vue frontend │ ────────▶ │ FastAPI backend          │ ───────▶ │ Ollama +     │
+│  :5173       │ ◀──────── │  teaching engine (code)  │ ◀─────── │ small model  │
+└──────────────┘   JSON    │  + language layer        │          │  :11434      │
+                           └──────────────────────────┘          └──────────────┘
                      all on the same machine, no internet needed
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
+The teaching engine is planned (see the [Roadmap](docs/ROADMAP.md)). [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) shows the current system and the target design.
 
 ## Quick start
 
@@ -83,7 +100,7 @@ math-tutor-ai/
 │   ├── main.py              App entry point, CORS, health routes
 │   ├── config.py            Settings (env vars / .env)
 │   ├── routers/tutor.py     /api/tutor endpoints
-│   ├── services/            Ollama client and prompt
+│   ├── services/            Ollama client, prompt and math verifier
 │   └── tests/               Pytest tests (Ollama is mocked)
 ├── frontend/                Vue 3 + Vite web app
 ├── docs/                    Contributor and project documentation
@@ -94,11 +111,12 @@ math-tutor-ai/
 
 | Doc | For |
 | --- | --- |
+| [docs/PEDAGOGY.md](docs/PEDAGOGY.md) | **Start here.** How the tutor teaches, and why |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute: workflow, branches, commits, PRs |
 | [docs/SETUP.md](docs/SETUP.md) | Detailed dev setup on Linux, macOS and Windows, plus troubleshooting |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the pieces fit together, and the design principles |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current system, target design, and design principles |
 | [docs/API.md](docs/API.md) | Backend endpoints and configuration |
-| [docs/CURRICULUM.md](docs/CURRICULUM.md) | CBE Grade 2 Mathematics scope |
+| [docs/CURRICULUM.md](docs/CURRICULUM.md) | CBE Grades 1–3 Mathematics scope and skill progression |
 | [docs/CHILD_SAFETY.md](docs/CHILD_SAFETY.md) | Rules for content, prompts and learner data |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | What's planned, plus good first issues |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
@@ -108,8 +126,8 @@ math-tutor-ai/
 
 You don't have to write code to help. We need:
 
-- 👩‍🏫 **Teachers and parents** to review explanations and suggest questions.
-- 🐍 **Python developers** for the backend, prompts and evaluation.
+- 👩‍🏫 **Teachers and parents** to break topics into skills, list common mistakes children make, and review explanations.
+- 🐍 **Python developers** for the teaching engine, prompts and evaluation.
 - 🎨 **Frontend developers and designers** for a child-friendly UI.
 - 🌍 **Translators** for Kiswahili support.
 

@@ -6,7 +6,7 @@ from routers.tutor import router as tutor_router
 
 app = FastAPI(
     title="Kenya Math Tutor API",
-    description="Offline AI math tutor for Kenyan Grade 2 (CBE aligned)",
+    description="Offline math tutor for Kenyan Lower Primary, Grades 1-3 (CBE aligned)",
     version="0.1.0",
 )
 

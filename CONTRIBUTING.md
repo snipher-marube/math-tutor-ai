@@ -8,19 +8,23 @@ By taking part you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 | You are… | You can… |
 | --- | --- |
-| A teacher or parent | Test the tutor, report bad answers with the **Curriculum / learning content** issue template, and suggest Grade 2 questions |
+| A teacher or parent | Break CBE topics into small skills, list common mistakes children make and how you respond, check [docs/CURRICULUM.md](docs/CURRICULUM.md) against the KICD designs, and report bad tutor answers. Use the **Curriculum / learning content** issue template. No coding needed |
 | A developer | Fix bugs, build features from the [Roadmap](docs/ROADMAP.md), and add tests |
-| A designer | Design a simple, colourful, accessible UI for young children |
+| A designer | Design a simple, colourful UI for children aged 6–9, including visual tools like counters, ten-frames and number lines |
 | A translator | Help add Kiswahili prompts and UI text |
 | Anyone | Improve the docs, triage issues, and share the project |
 
 ## Ground rules
 
-1. **Offline first.** Features must work without internet. Don't add calls to cloud APIs, CDNs, analytics or telemetry.
-2. **Child safe.** All content and prompts must follow [docs/CHILD_SAFETY.md](docs/CHILD_SAFETY.md).
-3. **Curriculum aligned.** Maths content should map to the Grade 2 scope in [docs/CURRICULUM.md](docs/CURRICULUM.md).
-4. **Runs on modest hardware.** Assume a laptop with 4–8 GB of RAM and no GPU. Raise any new dependency or bigger model in an issue first.
-5. **Small PRs.** One change per pull request. Small PRs get reviewed faster.
+Read [docs/PEDAGOGY.md](docs/PEDAGOGY.md) first. It explains how the tutor teaches, and every feature should fit it.
+
+1. **Teach, don't just answer.** Features should help a child understand, not just hand them an answer. Use the hint ladder instead of revealing answers.
+2. **Maths in code.** Correct answers, mistake detection and mastery are computed in code. The AI model only handles wording, and never decides whether an answer is correct.
+3. **Offline first.** Features must work without internet. Don't add calls to cloud APIs, CDNs, analytics or telemetry.
+4. **Child safe.** All content and prompts must follow [docs/CHILD_SAFETY.md](docs/CHILD_SAFETY.md).
+5. **Curriculum aligned.** Maths content should map to the Grades 1–3 scope in [docs/CURRICULUM.md](docs/CURRICULUM.md).
+6. **Runs on modest hardware.** Assume a laptop with 4–8 GB of RAM and no GPU. Raise any new dependency or bigger model in an issue first.
+7. **Small PRs.** One change per pull request. Small PRs get reviewed faster.
 
 ## Getting set up
 
@@ -68,9 +72,17 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 - No external fonts, CDNs or remote images. Bundle every asset so the app works offline.
 - Design for children: large touch targets, high contrast, minimal text, and no ads or links to the internet.
 
+### Teaching engine, skills and misconceptions
+
+- Follow [docs/PEDAGOGY.md](docs/PEDAGOGY.md) and go through its contributor checklist.
+- Every skill needs tests for its problem generator (answers are correct and within the skill's range) and its answer checker.
+- Every misconception rule needs a test showing the wrong answer it recognises and the feedback it triggers.
+- Mastery and review rules must be simple enough to explain to a teacher in one sentence.
+
 ### Prompts and learning content
 
-- Prompt changes can change the tutor's behaviour a lot. In the PR, include **before and after examples** for at least 3 questions from different strands.
+- Prompt changes can change the tutor's behaviour a lot. In the PR, include **before and after examples** for at least 3 questions from different strands and grades.
+- The AI model handles wording only. Never rely on it to produce or check a correct answer.
 - Use Kenyan context: names (Wanjiru, Otieno, Kiprop, Amina), shillings (KSh), local foods, objects and places.
 - Check that the maths is correct. A wrong answer is worse than no answer.
 
