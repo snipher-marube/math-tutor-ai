@@ -78,7 +78,7 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 - Skills live in `backend/skills/*.yaml`. See [docs/SKILLS.md](docs/SKILLS.md) for the format, and run `make skills` to check your changes.
 - Every skill needs a problem generator in `backend/services/problems.py`. Run `make problems` to see samples.
 - Every skill needs tests for its problem generator (answers are correct and within the skill's range) and its answer checker.
-- Every misconception rule needs a test showing the wrong answer it recognises and the feedback it triggers.
+- Every misconception rule (in `backend/services/answer_checker.py`) needs a test showing the wrong answer it recognises. Feedback must be at most 20 words and kind. A test checks this.
 - Mastery and review rules must be simple enough to explain to a teacher in one sentence.
 
 ### Prompts and learning content

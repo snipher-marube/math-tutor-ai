@@ -17,7 +17,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 ## v0.3: Teaching engine (no AI needed)
 - [x] Skill map format (data files) with prerequisites, plus the first skills: Grade 1–2 addition ([SKILLS.md](SKILLS.md))
 - [x] Problem generator per skill. Every problem has a correct answer computed in code
-- [ ] Answer checker with misconception detection for addition (see the table in [PEDAGOGY.md](PEDAGOGY.md#5-learn-from-wrong-answers-misconceptions))
+- [x] Answer checker with misconception detection for addition (see the table in [PEDAGOGY.md](PEDAGOGY.md#5-learn-from-wrong-answers-misconceptions))
 - [ ] Hint ladder data per skill: nudge, picture, worked example
 - [ ] Lesson API: `GET` next problem, `POST` answer, `GET` hint
 - [ ] Learner progress stored locally (SQLite), with mastery rules

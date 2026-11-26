@@ -80,15 +80,21 @@ When a child is stuck or wrong, the tutor **does not give the answer**. It climb
 ### 5. Learn from wrong answers (misconceptions)
 A wrong answer tells us *what* the child doesn't understand yet. The answer checker recognises common patterns and responds to the actual mistake:
 
-| Problem | Wrong answer | Likely misconception | Response |
-| --- | --- | --- | --- |
-| 7 + 5 | 75 | Joins the digits instead of adding | Count objects. Revisit what "+" means |
-| 52 − 17 | 45 | Subtracts the smaller digit from the bigger one in each column | Base-ten blocks: break a ten into ones |
-| 6 + 3 | 8 | Counts the starting number when counting on | Number line: start *on* 6, then jump 3 |
-| 23 + 14 | 127 or 64 | Mixes up tens and ones | Place-value chart: tens under tens |
-| ½ of 8 | 2 | Confuses "half" with "quarter" | Share 8 mangoes between 2 children |
+| Problem | Wrong answer | Likely misconception | Response | Status |
+| --- | --- | --- | --- | --- |
+| 7 + 5 | 75 | Joins the digits instead of adding | Count objects. Revisit what "+" means | Built |
+| 6 + 3 | 8 | Counts the starting number when counting on | Number line: start *on* 6, then jump 3 | Built |
+| 27 + 15 | 32 | Forgets the ten made by the ones | Base-ten blocks: swap 10 ones for 1 ten | Built |
+| 27 + 15 | 312 | Writes the ones total without regrouping | Base-ten blocks: swap 10 ones for 1 ten | Built |
+| 23 + 14 | 10 | Adds every digit as ones | Place-value chart: tens under tens | Built |
+| 23 + 14 | 73 | Writes the digits of the answer backwards | Point to the tens place and the ones place | Built |
+| 4 + ? = 10 | 14 | Adds the numbers shown instead of finding the missing part | Ten-frame: show the gap | Built |
+| 52 − 17 | 45 | Subtracts the smaller digit from the bigger one in each column | Base-ten blocks: break a ten into ones | Planned |
+| ½ of 8 | 2 | Confuses "half" with "quarter" | Share 8 mangoes between 2 children | Planned |
 
-This list will grow. Teachers are the best people to add to it.
+The built rules, with their feedback, are in `backend/services/answer_checker.py`, alongside rules for counting, number order and place value. This list will grow, and teachers are the best people to add to it.
+
+**How a mistake is matched:** the checker only looks at the problem and the child's answer. Rules are tried in order, and the first match wins. If no rule matches, the answer is simply marked wrong, and the tutor moves to the next hint-ladder step. A rule must recognise a mistake children really make, so "one less than the answer" only means *counted the starting number* for small, single-digit sums. In `58 + 18`, an answer of 75 is just a slip.
 
 ### 6. Short sessions, quick feedback, regular review
 - Sessions of **10–15 minutes**.
