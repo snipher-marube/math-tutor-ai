@@ -37,7 +37,7 @@ A teaching engine written in code drives learning. The small AI model is a helpe
 | Skill map | Ordered skills per CBE sub-strand, with prerequisites, stored as data files teachers can review | Built: `skills/*.yaml`, `services/skill_map.py` ([SKILLS.md](SKILLS.md)) |
 | Problem generator | Creates problems for a skill. The correct answer is computed in code | Built: `services/problems.py` |
 | Answer checker | Marks answers and recognises common misconceptions | Built: `services/answer_checker.py` |
-| Hint ladder | Nudge, then picture, then worked example, then a new try | Planned (v0.3) |
+| Hint ladder | Nudge, then picture, then worked example, then a new try | Built: `services/hints.py` |
 | Learner progress | Mastery per skill and review schedule, stored locally in SQLite | Planned (v0.3) |
 | Lesson API | Next problem, submit answer, get hint | Planned (v0.3) |
 | Language layer | The AI model writes word problems, re-explains, and encourages. It never decides correctness | Partly built: `services/ollama_client.py` |
@@ -70,6 +70,7 @@ Today the backend provides the free-question mode only. The frontend is still th
 | `services/skill_map.py` | Loads and checks the skill map in `skills/*.yaml`. Not used by an endpoint yet |
 | `services/problems.py` | One problem generator per skill. Answers are computed in code. Not used by an endpoint yet |
 | `services/answer_checker.py` | Marks an answer and names the likely mistake, with child feedback and a hint step. Not used by an endpoint yet |
+| `services/hints.py` | Builds the hint ladder for a problem: nudge, picture (a visual for the frontend) and worked example. Not used by an endpoint yet |
 | `skills/` | Skill map data files, one per CBE sub-strand ([SKILLS.md](SKILLS.md)) |
 | `tests/` | Pytest suite. The model is always faked |
 

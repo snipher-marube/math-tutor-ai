@@ -77,6 +77,22 @@ When a child is stuck or wrong, the tutor **does not give the answer**. It climb
 3. **Worked example:** a *similar* problem is solved step by step.
 4. **Try again:** a new problem of the same kind, so the child does it themselves.
 
+For example, a child stuck on `9 + 4 = ?`:
+
+| Step | The child hears | The screen shows |
+| --- | --- | --- |
+| Nudge | "Make 10 first. How many more does 9 need to make 10?" | — |
+| Picture | "Fill the ten-frame first. Then count the dots that are left over." | A ten-frame with 9 dots, plus 4 more |
+| Worked example | "Here's one I solved. Now you try yours the same way." | `8 + 7`: 8 needs 2 more to make 10. Take 2 from 7, that leaves 5. 10 + 5 = 15 |
+
+Rules the code enforces, with tests:
+- Hints use the problem's **own numbers** ("Start at 6…", not "Start at the first number…").
+- The nudge and picture **never say the answer**.
+- The worked example is a **different problem of the same kind, using the same strategy, with a different answer**. Showing `8 + 4 = 12` to a child stuck on `7 + 5` would give their answer away.
+- When the answer checker recognises a mistake, the ladder **starts at the step it suggests**, often the picture.
+
+The ladder is built in `backend/services/hints.py`.
+
 ### 5. Learn from wrong answers (misconceptions)
 A wrong answer tells us *what* the child doesn't understand yet. The answer checker recognises common patterns and responds to the actual mistake:
 
