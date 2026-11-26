@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -14,6 +16,8 @@ class Settings(BaseSettings):
     # Default grade when a request doesn't send one (Lower Primary: 1-3).
     GRADE_LEVEL: int = Field(default=2, ge=1, le=3)
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
+    # Local SQLite file for learners and progress. Never leaves the device.
+    DATABASE_PATH: Path = Path(__file__).resolve().parent / "data" / "math_tutor.db"
 
 
 settings = Settings()

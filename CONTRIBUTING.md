@@ -65,6 +65,7 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 - Use type hints on all functions. Use Pydantic models for request and response bodies.
 - Keep the layers separate: `routers/` handle HTTP, `services/` hold the logic and model calls, and `config.py` holds settings.
 - Tests go in `backend/tests/`. **Never call a real model in tests.** Mock `generate_tutor_response` or the Ollama client instead (see `tests/test_api.py`).
+- Every test automatically gets a fresh temporary database (see `tests/conftest.py`). Never commit a database file. `backend/data/` and `*.db` are ignored.
 
 ### Frontend (Vue)
 

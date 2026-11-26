@@ -89,3 +89,4 @@ git push origin main
 | `504 The tutor took longer than ... seconds` | The machine is slow or the model is still loading. Retry, raise `OLLAMA_TIMEOUT` in `.env`, or use a smaller model |
 | Responses are very slow | Try a smaller model (`qwen2.5:0.5b`) and close other heavy apps. The first request is slower while the model loads |
 | `uv: command not found` | Install uv (see the link above), then restart your terminal |
+| Want to start fresh with no learners | Stop the backend and delete `backend/data/`. It's recreated, empty, on the next start. This deletes **all** learner data on the device |

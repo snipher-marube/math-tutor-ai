@@ -18,7 +18,7 @@ Health check for scripts and monitoring.
 
 The teaching engine: problems, answer checking and hints. No AI is used. The answer to a problem **never** goes to the browser. The server remembers each problem it hands out and checks the child's answer itself.
 
-> Problems are kept in memory for now, so they're forgotten when the server restarts (asking about one then returns `404`). Learner progress with local storage is next on the [roadmap](ROADMAP.md).
+> Problems and answers are saved in the local database, so they survive a restart. Pass a `learner_id` to count the answers toward that learner's progress (see [Learners](#learners)).
 
 ### `GET /api/lesson/skills`
 All skills, in teaching order (prerequisites first).
@@ -31,15 +31,16 @@ All skills, in teaching order (prerequisites first).
 A new problem for a skill. Returns `201`.
 ```bash
 curl -X POST http://localhost:8000/api/lesson/problems \
-  -H "Content-Type: application/json" -d '{"skill_id": "add-within-100-with-regrouping"}'
+  -H "Content-Type: application/json" -d '{"skill_id": "add-within-100-with-regrouping", "learner_id": 1}'
 ```
+`learner_id` is optional. Without it, the problem is anonymous practice.
 ```json
 { "id": "4f70c7f0c8c4fe84", "skill_id": "add-within-100-with-regrouping",
   "kind": "add", "question": "78 + 12 = ?", "operands": [78, 12] }
 ```
 `operands` are the numbers the screen shows, for drawing visuals. For counting problems (`kind: "count"`), the operand is the number of objects to draw, which the child then counts.
 
-Errors: `404` for an unknown skill, or a skill with no problems yet.
+Errors: `404` for an unknown skill or learner, or a skill with no problems yet.
 
 ### `POST /api/lesson/problems/{id}/answer`
 Check the child's answer (a whole number from 0 to 10,000).
@@ -79,6 +80,40 @@ The hint ladder, from `start` (`nudge`, `picture` or `worked-example`) onwards. 
 Visual types and their `params` are listed in `backend/services/hints.py` (`Visual`). For a `number-line`, `blank` is the position the child fills in, so **always draw that box empty**.
 
 Errors: `404` if the problem isn't known, `422` for an invalid `start`.
+
+## Learners
+
+Learners and their progress are stored **only on this device**, in a local SQLite file (`DATABASE_PATH`). There are no accounts or passwords: anyone using the device can view or reset progress. See [CHILD_SAFETY.md](CHILD_SAFETY.md#data-and-privacy).
+
+### `POST /api/learners`
+Create a learner. Returns `201`.
+```json
+{ "nickname": "Simba", "avatar": "lion" }
+```
+```json
+{ "id": 1, "nickname": "Simba", "avatar": "lion", "created_at": "2026-11-26T11:57:25+00:00" }
+```
+- `nickname`: **a nickname, never a real full name.** 1–20 letters (any language), with single spaces, hyphens or apostrophes between words. Digits and symbols aren't allowed, so phone numbers and email addresses can't be used. Must be unique on the device, ignoring case.
+- `avatar` (optional): one of `lion`, `elephant`, `giraffe`, `zebra`, `cheetah`, `rhino`, `hippo`, `monkey`.
+
+Errors: `409` if the nickname is taken, `422` for an invalid nickname or avatar.
+
+### `GET /api/learners` and `GET /api/learners/{id}`
+List all learners (by nickname), or get one.
+
+### `GET /api/learners/{id}/progress`
+Totals for each skill the learner has practised, most recent first.
+```json
+[{ "skill_id": "add-within-10", "problems": 1, "attempts": 2, "correct": 1,
+   "last_practised": "2026-11-26T11:57:30+00:00" }]
+```
+Mastery ("has Simba mastered this skill?") comes in the next PR.
+
+### `DELETE /api/learners/{id}/progress`
+Delete all of the learner's problems and answers, but keep the learner. Returns `204`.
+
+### `DELETE /api/learners/{id}`
+Delete the learner and **everything** stored about them. Returns `204`.
 
 ## `POST /api/tutor/ask`
 Ask the tutor a free maths question. This is the secondary "ask a question" mode. The main lesson API is planned (see [ROADMAP.md](ROADMAP.md)).
@@ -126,3 +161,4 @@ Set these as environment variables or in `backend/.env` (see `backend/.env.examp
 | `OLLAMA_TIMEOUT` | `120` | Max seconds to wait for a model reply before returning `504` |
 | `GRADE_LEVEL` | `2` | Grade used when a request doesn't send one. Must be 1–3 |
 | `CORS_ORIGINS` | `["http://localhost:5173"]` | JSON list of allowed frontend origins |
+| `DATABASE_PATH` | `backend/data/math_tutor.db` | Local SQLite file for learners and progress. Never commit it |
