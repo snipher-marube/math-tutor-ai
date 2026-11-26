@@ -21,7 +21,7 @@ def test_health():
 
 
 def test_ask_returns_explanation(monkeypatch):
-    def fake_generate(question: str, grade: int = 2) -> str:
+    async def fake_generate(question: str, grade: int = 2) -> str:
         return f"Grade {grade}: 2 + 3 = 5"
 
     monkeypatch.setattr(routers.tutor, "generate_tutor_response", fake_generate)
