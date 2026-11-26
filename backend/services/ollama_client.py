@@ -1,3 +1,5 @@
+import asyncio
+
 from ollama import AsyncClient, ResponseError
 
 from config import settings
@@ -5,6 +7,10 @@ from config import settings
 
 class TutorUnavailableError(Exception):
     """Raised when the local model can't be reached or isn't installed."""
+
+
+class TutorTimeoutError(Exception):
+    """Raised when the model takes longer than OLLAMA_TIMEOUT to reply."""
 
 
 async def generate_tutor_response(question: str, grade: int = 2) -> str:
@@ -17,13 +23,19 @@ async def generate_tutor_response(question: str, grade: int = 2) -> str:
     # Async client so a slow model reply doesn't block other requests.
     client = AsyncClient(host=settings.OLLAMA_BASE_URL)
     try:
-        response = await client.chat(
-            model=settings.OLLAMA_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": question},
-            ],
-        )
+        async with asyncio.timeout(settings.OLLAMA_TIMEOUT):
+            response = await client.chat(
+                model=settings.OLLAMA_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": question},
+                ],
+            )
+    except TimeoutError as e:
+        raise TutorTimeoutError(
+            f"The tutor took longer than {settings.OLLAMA_TIMEOUT:g} seconds to answer. "
+            "Try again, use a smaller model, or raise OLLAMA_TIMEOUT."
+        ) from e
     except ConnectionError as e:
         raise TutorUnavailableError(
             f"Cannot reach Ollama at {settings.OLLAMA_BASE_URL}. Is it running? (`ollama serve`)"

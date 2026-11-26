@@ -10,8 +10,13 @@ from ollama import ResponseError
 
 import routers.tutor
 import services.ollama_client as ollama_client
+from config import settings
 from main import app
-from services.ollama_client import TutorUnavailableError, generate_tutor_response
+from services.ollama_client import (
+    TutorTimeoutError,
+    TutorUnavailableError,
+    generate_tutor_response,
+)
 
 
 class _FakeAsyncClient:
@@ -98,3 +103,19 @@ def test_slow_model_does_not_block_other_requests(monkeypatch):
 
     assert all(r.status_code == 200 for r in responses)
     assert elapsed < 1.0, f"requests ran one after another ({elapsed:.2f}s)"
+
+
+def test_slow_model_times_out_and_closes_client(monkeypatch):
+    _use_fake_client(monkeypatch, delay=0.5)
+    monkeypatch.setattr(settings, "OLLAMA_TIMEOUT", 0.05)
+    with pytest.raises(TutorTimeoutError, match="longer than 0.05 seconds"):
+        _generate()
+    assert _FakeAsyncClient.instances[0].closed
+
+
+def test_ask_returns_504_when_model_times_out(monkeypatch):
+    _use_fake_client(monkeypatch, delay=0.5)
+    monkeypatch.setattr(settings, "OLLAMA_TIMEOUT", 0.05)
+    res = TestClient(app).post("/api/tutor/ask", json={"question": "What is 1 + 1?"})
+    assert res.status_code == 504
+    assert "OLLAMA_TIMEOUT" in res.json()["detail"]
