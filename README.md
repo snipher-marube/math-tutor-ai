@@ -111,7 +111,7 @@ math-tutor-ai/
 
 | Doc | For |
 | --- | --- |
-| [docs/PEDAGOGY.md](docs/PEDAGOGY.md) | **Start here.** How the tutor teaches, and why |
+| [docs/PEDAGOGY.md](docs/PEDAGOGY.md) | **Start here.** How the tutor teaches, and why, plus an FAQ |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute: workflow, branches, commits, PRs |
 | [docs/SETUP.md](docs/SETUP.md) | Detailed dev setup on Linux, macOS and Windows, plus troubleshooting |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current system, target design, and design principles |

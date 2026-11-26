@@ -116,12 +116,53 @@ The model adds value where language matters:
 - **Word problems:** turning a known sum (from the generator) into a short Kenyan story. Code checks that the story uses the right numbers.
 - **Re-explaining** in simpler words, or in Kiswahili.
 - **Varied, warm feedback**, so the app doesn't feel robotic.
-- **"Ask me a maths question" mode:** the existing free-question chat (`/api/tutor/ask`). This stays as a secondary mode, kept on maths topics, with answers verified in code where possible.
+- **"Ask me a maths question" mode:** the existing free-question chat (`/api/tutor/ask`). This stays as a secondary mode, kept on maths topics. The AI turns the question into a sum and explains it, and code calculates and checks the answer where possible (see the [FAQ](#what-happens-if-a-child-asks-a-question-the-system-doesnt-know)).
 
 ## How we will know it works
 
 - **Automated:** tests for every skill's generator, checker and misconception rules. An evaluation set to measure how well the AI's wording follows the rules.
 - **With learners:** short pre- and post-checks per skill during field testing with real classrooms. The question is always "did the child learn?", not "did the child enjoy chatting?"
+
+## Frequently asked questions
+
+### Are the answers already stored somewhere?
+No. Each skill holds a **recipe**, not a list of questions. For "add within 20", the recipe is: pick two numbers whose sum is 20 or less, and the answer is their sum. Each time a problem is needed, the code picks new numbers (say 8 and 5) and calculates the answer (13). The variety is effectively endless, and every answer is correct because it was calculated, not guessed.
+
+### What happens if a child asks a question the system doesn't know?
+That depends on the mode:
+
+- **Lesson mode (the main experience):** the tutor asks the questions and the child answers. Every question comes from the engine, so there are no "unknown" questions.
+- **"Ask a question" mode:** the child types or says their own question. This mode **uses the AI model**, so open questions still get a helpful answer. The work is split:
+  1. **The AI translates.** It turns a word problem ("Wanjiru has 5 mangoes and buys 3 more") into a sum: `5 + 3`.
+  2. **The code calculates.** It works out `8` and checks the AI's explanation against it.
+  3. **If the code can't check it** (for example, a "why" question about shapes), the AI still answers, and the answer is marked as unchecked.
+  4. **If the question is above Grade 3, or not about maths,** the tutor gently says so and steers back.
+
+Today the verifier only checks questions written with symbols ("What is 14 + 5?"). Having the AI turn word problems into sums is on the [roadmap](ROADMAP.md).
+
+### So is the AI being removed?
+No. The AI is given the job it's good at, **language**, and kept away from the job it's bad at, **reliable arithmetic**.
+
+### Will the tutor keep learning over time?
+Yes, in three different ways:
+
+| Kind of learning | How it happens | Where |
+| --- | --- | --- |
+| **It learns each child** | The engine records what each child has mastered, which mistakes they repeat, and what needs review, and picks tomorrow's problems from that | On the device. No model training |
+| **The project gets better** | Teachers add skills, common mistakes, hints and explanations as data files | In this repository. Every learner benefits from the next update |
+| **The AI model gets better** | Fine-tuning a small model on teacher-reviewed examples, so its wording is simpler, warmer and more Kenyan | Done by maintainers, offline, and shipped as a normal update |
+
+### Will the model be fine-tuned on what children type?
+No. The model **never learns live from children**:
+
+- **Safety.** Children's input could teach it wrong or unsafe things.
+- **Privacy.** Training on children's data would mean sending it off the device, which breaks our [privacy rules](CHILD_SAFETY.md#data-and-privacy).
+- **Hardware.** The laptops we target can't train models.
+
+Fine-tuning data will come from examples written or approved by teachers. Two more rules apply:
+
+- **It needs a test first.** We'll fine-tune only after the evaluation set exists, so we can prove the new model is actually better.
+- **The maths stays in code.** Fine-tuning improves wording, not arithmetic. Even a fine-tuned small model can get sums wrong.
 
 ## Checklist for contributors
 
