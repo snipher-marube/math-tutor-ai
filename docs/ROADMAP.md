@@ -19,7 +19,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] Problem generator per skill. Every problem has a correct answer computed in code
 - [x] Answer checker with misconception detection for addition (see the table in [PEDAGOGY.md](PEDAGOGY.md#5-learn-from-wrong-answers-misconceptions))
 - [x] Hint ladder per problem kind: nudge, picture, worked example
-- [ ] Lesson API: `GET` next problem, `POST` answer, `GET` hint
+- [x] Lesson API: new problem, check answer, get hints ([API.md](API.md#lesson-api))
 - [ ] Learner progress stored locally (SQLite), with mastery rules
 - [ ] Placement check to find each learner's starting level
 - [ ] Spaced review of mastered skills

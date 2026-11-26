@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
+from routers.lesson import router as lesson_router
 from routers.tutor import router as tutor_router
 
 app = FastAPI(
@@ -19,6 +20,7 @@ app.add_middleware(
     allow_methods=["*"],
 )
 
+app.include_router(lesson_router)
 app.include_router(tutor_router)
 
 

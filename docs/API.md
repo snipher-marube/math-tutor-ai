@@ -14,6 +14,72 @@ Health check for scripts and monitoring.
 { "status": "ok" }
 ```
 
+## Lesson API
+
+The teaching engine: problems, answer checking and hints. No AI is used. The answer to a problem **never** goes to the browser. The server remembers each problem it hands out and checks the child's answer itself.
+
+> Problems are kept in memory for now, so they're forgotten when the server restarts (asking about one then returns `404`). Learner progress with local storage is next on the [roadmap](ROADMAP.md).
+
+### `GET /api/lesson/skills`
+All skills, in teaching order (prerequisites first).
+```json
+[{ "id": "count-to-20", "name": "Count objects to 20", "grade": 1, "strand": "numbers",
+   "substrand": "whole-numbers", "requires": [], "description": "...", "examples": ["..."] }, ...]
+```
+
+### `POST /api/lesson/problems`
+A new problem for a skill. Returns `201`.
+```bash
+curl -X POST http://localhost:8000/api/lesson/problems \
+  -H "Content-Type: application/json" -d '{"skill_id": "add-within-100-with-regrouping"}'
+```
+```json
+{ "id": "4f70c7f0c8c4fe84", "skill_id": "add-within-100-with-regrouping",
+  "kind": "add", "question": "78 + 12 = ?", "operands": [78, 12] }
+```
+`operands` are the numbers the screen shows, for drawing visuals. For counting problems (`kind: "count"`), the operand is the number of objects to draw, which the child then counts.
+
+Errors: `404` for an unknown skill, or a skill with no problems yet.
+
+### `POST /api/lesson/problems/{id}/answer`
+Check the child's answer (a whole number from 0 to 10,000).
+```json
+{ "answer": 80 }
+```
+Wrong, with a recognised mistake:
+```json
+{ "correct": false,
+  "feedback": "The ones made a new ten! Let's swap 10 ones for 1 ten and add it to the tens.",
+  "misconception": "forgot-to-regroup", "next_hint": "picture", "attempts": 1 }
+```
+Correct, after trying again:
+```json
+{ "correct": true, "feedback": "You kept trying and you got it. Well done!",
+  "misconception": null, "next_hint": null, "attempts": 2 }
+```
+- `feedback` is what to show and read aloud to the child.
+- `misconception` is for teachers. Don't show the id to the child.
+- `next_hint` is the hint-ladder step to offer next: the checker's suggestion for a recognised mistake, otherwise `"nudge"`.
+
+Errors: `404` if the problem isn't known, `422` for an invalid answer.
+
+### `GET /api/lesson/problems/{id}/hints?start=nudge`
+The hint ladder, from `start` (`nudge`, `picture` or `worked-example`) onwards. It's the same every time for a given problem.
+```json
+[{ "step": "picture", "text": "Put the ones together. Can you make a new ten?",
+   "visual": { "type": "base-ten", "params": { "a_tens": 7, "a_ones": 8, "b_tens": 1, "b_ones": 2 } },
+   "example": null },
+ { "step": "worked-example", "text": "Here's one I solved. Now you try yours the same way.",
+   "visual": null,
+   "example": { "question": "41 + 19 = ?",
+                "steps": ["Ones: 1 + 9 = 10. That's 1 ten and 0 ones.",
+                          "Tens: 4 + 1 = 5, plus the new ten is 6.",
+                          "6 tens and 0 ones is 60.", "So 41 + 19 = 60."] } }]
+```
+Visual types and their `params` are listed in `backend/services/hints.py` (`Visual`). For a `number-line`, `blank` is the position the child fills in, so **always draw that box empty**.
+
+Errors: `404` if the problem isn't known, `422` for an invalid `start`.
+
 ## `POST /api/tutor/ask`
 Ask the tutor a free maths question. This is the secondary "ask a question" mode. The main lesson API is planned (see [ROADMAP.md](ROADMAP.md)).
 

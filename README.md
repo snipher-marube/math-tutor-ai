@@ -69,7 +69,17 @@ make backend     # http://localhost:8000  (API docs at /docs)
 make frontend    # http://localhost:5173
 ```
 
-Try it:
+Try a lesson problem (no AI needed):
+
+```bash
+curl -X POST http://localhost:8000/api/lesson/problems \
+  -H "Content-Type: application/json" \
+  -d '{"skill_id": "add-within-20"}'
+```
+
+Then answer it, or ask for hints, using the returned `id` (see [docs/API.md](docs/API.md#lesson-api)). Or open http://localhost:8000/docs to try every endpoint in the browser.
+
+Ask the AI a free question:
 
 ```bash
 curl -X POST http://localhost:8000/api/tutor/ask \
@@ -101,7 +111,8 @@ math-tutor-ai/
 ├── backend/                 FastAPI app (Python, managed with uv)
 │   ├── main.py              App entry point, CORS, health routes
 │   ├── config.py            Settings (env vars / .env)
-│   ├── routers/tutor.py     /api/tutor endpoints
+│   ├── routers/lesson.py    /api/lesson endpoints (teaching engine)
+│   ├── routers/tutor.py     /api/tutor endpoints (free questions, AI)
 │   ├── services/            Ollama client, verifier, skill map, problems, answer checker, hints
 │   ├── skills/              Skill map: one YAML file per CBE sub-strand
 │   └── tests/               Pytest tests (Ollama is mocked)
