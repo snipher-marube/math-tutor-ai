@@ -79,6 +79,7 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 - Every skill needs a problem generator in `backend/services/problems.py`. Run `make problems` to see samples.
 - Every skill needs tests for its problem generator (answers are correct and within the skill's range) and its answer checker.
 - Every misconception rule (in `backend/services/answer_checker.py`) needs a test showing the wrong answer it recognises. Feedback must be at most 20 words and kind. A test checks this.
+- Hints (in `backend/services/hints.py`) must never give the answer away. Tests check that nudges and pictures never say it, and that worked examples always have a different answer.
 - Mastery and review rules must be simple enough to explain to a teacher in one sentence.
 
 ### Prompts and learning content
