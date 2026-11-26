@@ -11,8 +11,18 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, Field, StringConstraints
 
-from dependencies import LearnerStoreDep
-from services.learners import AVATARS, Learner, NicknameTakenError
+from config import settings
+from dependencies import LearnerStoreDep, SkillMapDep
+from services.learners import AVATARS, Learner, LearnerStore, NicknameTakenError
+from services.mastery import (
+    RECENT_PROBLEMS,
+    REQUIRED_CORRECT,
+    REQUIRED_DAYS,
+    SkillMastery,
+    Status,
+    next_skill,
+    skill_mastery,
+)
 
 router = APIRouter(prefix="/api/learners", tags=["learners"])
 
@@ -45,19 +55,44 @@ class LearnerOut(BaseModel):
     created_at: str
 
 
+MASTERY_RULE = (
+    f"Mastered when at least {REQUIRED_CORRECT} of the last {RECENT_PROBLEMS} problems "
+    f"were right on the first try, on at least {REQUIRED_DAYS} different days."
+)
+
+
 class SkillProgressOut(BaseModel):
     skill_id: str
+    status: Status = Field(description=MASTERY_RULE)
     problems: int = Field(description="Problems started")
-    attempts: int = Field(description="Answers given")
-    correct: int = Field(description="Correct answers")
+    attempts: int = Field(description="Answers given, including retries")
+    correct: int = Field(description="Correct answers, including retries")
+    recent_total: int = Field(description=f"First answers counted (up to {RECENT_PROBLEMS})")
+    recent_correct: int = Field(description="Of those, how many were right on the first try")
+    correct_days: int = Field(description="Different days those right answers were on")
     last_practised: str
+
+
+class NextSkillOut(BaseModel):
+    skill_id: str | None = Field(description="None when every skill is mastered")
+    name: str | None
+    grade: int | None
+    status: Status | None
+    reason: str = Field(description="Why this skill, for teachers and parents")
 
 
 def _out(learner: Learner) -> LearnerOut:
     return LearnerOut(**learner.__dict__)
 
 
-def _get_or_404(store, learner_id: int) -> Learner:
+def _mastery(store: LearnerStore, learner_id: int) -> dict[str, SkillMastery]:
+    return {
+        skill_id: skill_mastery(answers, settings.TIMEZONE)
+        for skill_id, answers in store.first_answers(learner_id).items()
+    }
+
+
+def _get_or_404(store: LearnerStore, learner_id: int) -> Learner:
     learner = store.get(learner_id)
     if learner is None:
         raise HTTPException(404, "Learner not found")
@@ -89,9 +124,44 @@ def get_learner(learner_id: int, store: LearnerStoreDep) -> LearnerOut:
 
 @router.get("/{learner_id}/progress", response_model=list[SkillProgressOut])
 def get_progress(learner_id: int, store: LearnerStoreDep) -> list[SkillProgressOut]:
-    """Totals per skill practised, most recent first. Mastery comes in a later PR."""
+    """Totals and mastery for each skill practised, most recent first."""
     _get_or_404(store, learner_id)
-    return [SkillProgressOut(**p.__dict__) for p in store.progress(learner_id)]
+    mastery = _mastery(store, learner_id)
+    none_answered = skill_mastery([], settings.TIMEZONE)
+    out = []
+    for p in store.progress(learner_id):
+        m = mastery.get(p.skill_id, none_answered)
+        # Started a problem but not answered anything yet: still practising.
+        status: Status = "practising" if m.status == "not-started" else m.status
+        out.append(
+            SkillProgressOut(
+                **p.__dict__,
+                status=status,
+                recent_total=m.recent_total,
+                recent_correct=m.recent_correct,
+                correct_days=m.correct_days,
+            )
+        )
+    return out
+
+
+@router.get("/{learner_id}/next-skill", response_model=NextSkillOut)
+def get_next_skill(learner_id: int, store: LearnerStoreDep, skill_map: SkillMapDep) -> NextSkillOut:
+    """The skill this learner should work on next.
+
+    The first skill in teaching order that isn't mastered yet and whose
+    prerequisites are all mastered. A new learner starts at the first skill.
+    """
+    _get_or_404(store, learner_id)
+    statuses = {skill_id: m.status for skill_id, m in _mastery(store, learner_id).items()}
+    nxt = next_skill(skill_map, statuses)
+    return NextSkillOut(
+        skill_id=nxt.skill.id if nxt.skill else None,
+        name=nxt.skill.name if nxt.skill else None,
+        grade=nxt.skill.grade if nxt.skill else None,
+        status=nxt.status,
+        reason=nxt.reason,
+    )
 
 
 @router.delete("/{learner_id}/progress", status_code=204)

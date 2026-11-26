@@ -53,7 +53,16 @@ Each CBE sub-strand is broken into **small skills**, each with prerequisites. Fo
 count to 20 → add within 10 → make 10 → add within 20 → add tens → add tens and ones → add with regrouping
 ```
 
-A child moves to the next skill only after **showing mastery**: for example, at least 4 of the last 5 answers correct, on at least two different days. Mastery is per skill, not per grade.
+A child moves to the next skill only after **showing mastery**. The rule, simple enough to explain to a teacher in one sentence:
+
+> **A skill is mastered when at least 4 of the learner's last 5 problems were answered correctly on the first try, on at least 2 different days.**
+
+- **Only the first answer to each problem counts.** Getting it right after a hint or a second try is good learning, but it doesn't show mastery yet.
+- **Two different days** shows the skill has stuck, not just been remembered for one session. Days are counted in **local time** (`TIMEZONE`, `Africa/Nairobi` by default).
+- **Only the latest 5 problems count**, so if a child starts getting a skill wrong again, it goes back to *practising*.
+- The tutor then offers the **next skill**: the first one in teaching order that isn't mastered yet and whose prerequisites all are. A new learner starts at the first skill. A placement check is planned, so that learners can start at their real level.
+
+Mastery is per skill, not per grade. The rule is in `backend/services/mastery.py`.
 
 ### 2. Teach at the right level, not the right grade
 Many Grade 3 learners are still working at a Grade 1 level in maths. A short, friendly **placement check** finds where each child really is, and the engine starts them there. This is the idea behind **Teaching at the Right Level (TaRL)**, one of the best-evidenced approaches in education research, used widely in Kenya and across Africa.

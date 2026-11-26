@@ -21,7 +21,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] Hint ladder per problem kind: nudge, picture, worked example
 - [x] Lesson API: new problem, check answer, get hints ([API.md](API.md#lesson-api))
 - [x] Learners and progress stored locally (SQLite), with view, reset and delete
-- [ ] Mastery rules, and choosing each learner's next skill
+- [x] Mastery rules, and choosing each learner's next skill
 - [ ] Placement check to find each learner's starting level
 - [ ] Spaced review of mastered skills
 - [ ] 🟢 Add subtraction skills and misconceptions
