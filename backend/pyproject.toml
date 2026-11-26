@@ -1,10 +1,28 @@
 [project]
-name = "backend"
+name = "math-tutor-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "FastAPI backend for an offline AI math tutor for Kenyan Grade 2 learners (CBE)"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.165.0",
     "ollama>=0.6.3",
+    "pydantic-settings>=2.16.3",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
