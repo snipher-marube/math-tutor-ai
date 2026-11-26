@@ -41,7 +41,9 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [ ] Teacher and parent view: progress per skill, suggested groups
 - [ ] Evaluation set: 100+ problems with answers across all strands and grades (`backend/eval/`)
 - [ ] 🟢 Script to run the eval set against a model and report how well it follows the rules
+- [ ] "Ask a question" mode: AI turns word problems into a sum, code calculates and checks the answer
 - [ ] Compare small models (qwen2.5 0.5b/1.5b, llama3.2:1b, gemma3:1b) and document the results
+- [ ] Fine-tune a small model on teacher-reviewed explanations (only after the evaluation set exists, and never on learner data). See the [FAQ](PEDAGOGY.md#will-the-model-be-fine-tuned-on-what-children-type)
 
 ## v1.0: Deployable and proven
 - [ ] One-command install (Docker Compose and/or packaged installers)
