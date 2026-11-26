@@ -1,6 +1,16 @@
 # Frontend
 
-Vue 3 + Vite web app for learners. It is currently the Vite starter page. Building the child-friendly UI is the top item on the [roadmap](../docs/ROADMAP.md).
+Vue 3 + Vite web app for learners: pick or create a nickname, then practise one problem at a time with big number buttons, kind feedback and hints.
+
+| File | What it does |
+| --- | --- |
+| `src/App.vue` | Two screens: choose a learner, then the lesson |
+| `src/components/LearnerPicker.vue` | List learners, or make a learner card (nickname and animal) |
+| `src/components/LessonView.vue` | One problem at a time: answer, feedback, hints, next problem |
+| `src/components/NumberPad.vue` | Big number buttons (laptop number keys, Backspace and Enter work too) |
+| `src/components/HintPanel.vue` | The hint ladder, one step at a time |
+| `src/components/ProblemVisual.vue` | Draws counters, ten-frames, number lines and tens-and-ones blocks |
+| `src/lib/api.js` | Calls the backend at `/api` |
 
 ```bash
 npm ci
@@ -8,4 +18,14 @@ npm run dev     # http://localhost:5173
 npm run build   # production build in dist/
 ```
 
-The backend must be running on `http://localhost:8000` (see [../docs/SETUP.md](../docs/SETUP.md)). Keep the app offline-capable: no CDNs, remote fonts or remote images.
+The backend must be running (see [../docs/SETUP.md](../docs/SETUP.md)). In development, Vite sends `/api` requests to `http://localhost:8000`. To use a backend on another port, set `VITE_API_TARGET`:
+
+```bash
+VITE_API_TARGET=http://localhost:8001 npm run dev
+```
+
+Rules for this app:
+- **Offline only:** no CDNs, remote fonts or remote images. Bundle every asset.
+- **For children aged 6–9:** big touch targets (at least 48px, 56px on touch screens), high contrast, light and dark mode, and short text.
+- **Never show the answer before the child gives it.** A number line's `blank` box stays empty, and `misconception` ids are for teachers, not children.
+- **Accessible:** real `<button>`s and labelled inputs, one polite live region for feedback, and visible focus outlines.

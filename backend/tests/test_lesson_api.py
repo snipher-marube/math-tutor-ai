@@ -140,6 +140,7 @@ def test_hint_ladder(client, store):
         "params": {"filled": 7, "size": 10, "extra": 5},
     }
     example = hints[2]["example"]
+    assert example["kind"] == "add" and len(example["operands"]) == 2
     assert example["question"] != "7 + 5 = ?"
     assert "12" not in example["steps"][-1], "example must not share the answer"
 

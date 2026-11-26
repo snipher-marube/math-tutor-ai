@@ -10,7 +10,7 @@ Many Kenyan schools and homes have little or no internet. Math Tutor AI runs ent
 
 It isn't just a chatbot. A **teaching engine** written in code decides what each child should learn next, gives problems with answers it has worked out itself, spots the specific mistake a child makes, and gives hints instead of answers. A small local AI model (through [Ollama](https://ollama.com)) helps with the language: child-friendly wording, Kenyan stories and encouragement. Read **[how it teaches](docs/PEDAGOGY.md)**.
 
-> **Status: early stage (v0.2).** Today the backend answers free maths questions with a local model and checks the arithmetic in code. The teaching engine and the child-friendly app are next, and the frontend is still the Vite starter page. This is a great time to get involved. See the [Roadmap](docs/ROADMAP.md).
+> **Status: early stage (v0.3).** The teaching engine works end to end for counting and Grade 1–2 addition: skills, problems, mistake-aware feedback, hints, mastery and "what's next". A first lesson screen lets children practise in the browser. Read-aloud, Kiswahili, more skills and the AI language layer are next. This is a great time to get involved. See the [Roadmap](docs/ROADMAP.md).
 
 ---
 
@@ -66,7 +66,7 @@ make model
 
 # 4. Run the backend and frontend (two terminals)
 make backend     # http://localhost:8000  (API docs at /docs)
-make frontend    # http://localhost:5173
+make frontend    # http://localhost:5173  ← open this to try a lesson
 ```
 
 Try a lesson problem (no AI needed):
@@ -118,7 +118,7 @@ math-tutor-ai/
 │   ├── skills/              Skill map: one YAML file per CBE sub-strand
 │   ├── data/                Local learner database (created on first run, never committed)
 │   └── tests/               Pytest tests (Ollama is mocked)
-├── frontend/                Vue 3 + Vite web app
+├── frontend/                Vue 3 + Vite web app (learner picker and lesson screen)
 ├── docs/                    Contributor and project documentation
 └── .github/                 CI, issue and PR templates
 ```

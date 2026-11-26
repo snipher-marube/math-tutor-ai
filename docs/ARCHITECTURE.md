@@ -47,7 +47,7 @@ See [ROADMAP.md](ROADMAP.md) for the order of work.
 
 ## Current system (v0.2)
 
-Today the backend has two modes: the **lesson API** (the teaching engine, no AI) and the **free-question mode** (AI). The frontend is still the Vite starter page.
+Today the backend has two modes: the **lesson API** (the teaching engine, no AI) and the **free-question mode** (AI). The frontend has a learner picker and a lesson screen that use the lesson and learner APIs.
 
 ```
 ┌──────────────┐  /api/lesson/*        ┌──────────────────────────────┐
@@ -104,7 +104,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 ## Known limitations (v0.2)
 
 - No placement check or spaced review yet. A new learner always starts at the first skill.
-- No child-friendly frontend yet, so the lesson API can only be tried with `curl` or `/docs`.
+- The lesson screen has no read-aloud, Kiswahili or rewards yet, and no frontend tests.
 - The verifier only checks questions written with symbols ("What is 14 + 5?"), not word problems.
 - Free questions have no conversation memory. Each question stands alone.
 

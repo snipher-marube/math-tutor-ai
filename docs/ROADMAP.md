@@ -28,9 +28,11 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [ ] 🟢 Add skills for other sub-strands (money, time, shapes, ...)
 
 ## v0.4: Child-friendly app
-- [ ] Replace the Vite starter page with the lesson screen: one problem, big number buttons, instant feedback
-- [ ] Visual tools: counters, ten-frames, number line, base-ten blocks, Kenyan coins
-- [ ] Hint ladder in the UI
+- [x] Replace the Vite starter page with the lesson screen: one problem, big number buttons, instant feedback
+- [x] Visual tools: counters, ten-frames, number line, base-ten blocks
+- [ ] Visual tools: Kenyan coins, and tapping or moving counters (not just looking)
+- [x] Hint ladder in the UI
+- [ ] 🟢 Frontend tests (Vitest and Vue Test Utils) for the number pad, visuals and lesson flow
 - [ ] Read-aloud with offline text-to-speech
 - [ ] Rewards for effort and progress (stars, a skill path)
 - [ ] 🟢 "Ask a question" screen that uses `POST /api/tutor/ask`, with a loading state
