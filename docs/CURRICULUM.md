@@ -53,7 +53,7 @@ Each sub-strand gets broken into small, ordered skills with prerequisites, so th
 | Add within 100, with regrouping | 2 | Add within 100, no regrouping |
 | Add within 1,000 | 3 | Add within 100, with regrouping; place value: hundreds |
 
-The skill map will live in the repository as data files that teachers can review without writing code. The file format will be proposed in its own PR.
+The skill map lives in `backend/skills/` as data files that teachers can review without writing code. See [SKILLS.md](SKILLS.md).
 
 ## How the tutor should teach
 

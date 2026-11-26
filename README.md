@@ -90,6 +90,7 @@ No `make`? Platform-specific steps (including Windows) are in **[docs/SETUP.md](
 | `make test`     | Run backend tests (no model needed)  |
 | `make lint`     | Check code style                     |
 | `make format`   | Auto-format code                     |
+| `make skills`   | Check the skill map files            |
 | `make build`    | Production build of the frontend     |
 
 ## Project structure
@@ -100,7 +101,8 @@ math-tutor-ai/
 │   ├── main.py              App entry point, CORS, health routes
 │   ├── config.py            Settings (env vars / .env)
 │   ├── routers/tutor.py     /api/tutor endpoints
-│   ├── services/            Ollama client, prompt and math verifier
+│   ├── services/            Ollama client, math verifier, skill map loader
+│   ├── skills/              Skill map: one YAML file per CBE sub-strand
 │   └── tests/               Pytest tests (Ollama is mocked)
 ├── frontend/                Vue 3 + Vite web app
 ├── docs/                    Contributor and project documentation
@@ -117,6 +119,7 @@ math-tutor-ai/
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Current system, target design, and design principles |
 | [docs/API.md](docs/API.md) | Backend endpoints and configuration |
 | [docs/CURRICULUM.md](docs/CURRICULUM.md) | CBE Grades 1–3 Mathematics scope and skill progression |
+| [docs/SKILLS.md](docs/SKILLS.md) | How to read, add and check skills (for teachers, no coding needed) |
 | [docs/CHILD_SAFETY.md](docs/CHILD_SAFETY.md) | Rules for content, prompts and learner data |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | What's planned, plus good first issues |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |

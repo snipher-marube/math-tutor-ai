@@ -1,0 +1,79 @@
+# Skills for the CBE sub-strand "Addition" (strand: Numbers).
+# Skills are listed in the order they are usually taught.
+# How to read and edit this file: see docs/SKILLS.md
+
+strand: numbers
+substrand: addition
+
+skills:
+  - id: add-within-10
+    name: Add within 10
+    grade: 1
+    requires: [count-to-20]
+    numbers: { min: 0, max: 10 }
+    description: >
+      Put two small groups together and find how many there are altogether,
+      first by counting all the objects, then by counting on.
+    examples:
+      - Wanjiru has 4 mangoes. She picks 3 more. How many mangoes does she have?
+      - 5 + 2 = ?
+
+  - id: make-10
+    name: Make 10
+    grade: 1
+    requires: [add-within-10]
+    numbers: { min: 0, max: 10 }
+    description: >
+      Know the pairs of numbers that add up to 10 (number bonds to 10),
+      for example 7 and 3, using a ten-frame.
+    examples:
+      - 6 + ? = 10
+      - The ten-frame has 8 dots. How many more make 10?
+
+  - id: add-within-20
+    name: Add within 20
+    grade: 1
+    requires: [make-10]
+    numbers: { min: 0, max: 20 }
+    description: >
+      Add two numbers with a total up to 20, using strategies such as
+      counting on from the bigger number and making 10 first (8 + 5 = 8 + 2 + 3).
+    examples:
+      - 9 + 6 = ?
+      - Otieno has 8 sweets and gets 7 more. How many sweets does he have now?
+
+  - id: add-tens
+    name: Add tens
+    grade: 2
+    requires: [place-value-tens-ones, add-within-10]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Add whole tens, using the fact that 3 tens + 4 tens = 7 tens,
+      so 30 + 40 = 70.
+    examples:
+      - 20 + 50 = ?
+      - Amina has KSh 30 and gets KSh 40. How much money does she have?
+
+  - id: add-within-100-no-regrouping
+    name: Add within 100 without regrouping
+    grade: 2
+    requires: [add-within-20, add-tens]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Add two-digit numbers where the ones add up to 9 or less,
+      adding the tens and the ones separately (23 + 14 = 37).
+    examples:
+      - 23 + 14 = ?
+      - 41 + 35 = ?
+
+  - id: add-within-100-with-regrouping
+    name: Add within 100 with regrouping
+    grade: 2
+    requires: [add-within-100-no-regrouping]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Add two-digit numbers where the ones add up to 10 or more,
+      exchanging 10 ones for 1 ten (27 + 15 = 42).
+    examples:
+      - 27 + 15 = ?
+      - Kiprop has 38 marbles and wins 24 more. How many marbles does he have?

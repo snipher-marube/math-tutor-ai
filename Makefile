@@ -1,5 +1,5 @@
 # Common developer tasks. Run `make help` to list them.
-.PHONY: help setup model backend frontend dev test lint format build
+.PHONY: help setup model backend frontend dev test lint format build skills
 
 OLLAMA_MODEL ?= qwen2.5:1.5b
 
@@ -28,6 +28,9 @@ lint: ## Check backend code style
 
 format: ## Auto-format backend code
 	cd backend && uv run ruff check --fix . && uv run ruff format .
+
+skills: ## Check the skill map files and list skills in teaching order
+	cd backend && uv run python -m services.skill_map
 
 build: ## Build the frontend for production
 	cd frontend && npm run build

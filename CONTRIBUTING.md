@@ -75,6 +75,7 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 ### Teaching engine, skills and misconceptions
 
 - Follow [docs/PEDAGOGY.md](docs/PEDAGOGY.md) and go through its contributor checklist.
+- Skills live in `backend/skills/*.yaml`. See [docs/SKILLS.md](docs/SKILLS.md) for the format, and run `make skills` to check your changes.
 - Every skill needs tests for its problem generator (answers are correct and within the skill's range) and its answer checker.
 - Every misconception rule needs a test showing the wrong answer it recognises and the feedback it triggers.
 - Mastery and review rules must be simple enough to explain to a teacher in one sentence.
