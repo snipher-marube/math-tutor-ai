@@ -102,7 +102,7 @@ math-tutor-ai/
 │   ├── main.py              App entry point, CORS, health routes
 │   ├── config.py            Settings (env vars / .env)
 │   ├── routers/tutor.py     /api/tutor endpoints
-│   ├── services/            Ollama client, math verifier, skill map, problem generators
+│   ├── services/            Ollama client, math verifier, skill map, problems, answer checker
 │   ├── skills/              Skill map: one YAML file per CBE sub-strand
 │   └── tests/               Pytest tests (Ollama is mocked)
 ├── frontend/                Vue 3 + Vite web app
