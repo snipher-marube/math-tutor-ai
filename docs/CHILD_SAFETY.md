@@ -22,8 +22,9 @@ Our users are Lower Primary learners (Grades 1–3), about **6–9 years old**. 
 
 - **Everything stays on the device.** No telemetry, analytics, crash reporting, or remote logging.
 - Don't store learner questions unless a feature clearly needs it. If it does, store them locally, make deletion easy, and document it.
-- No accounts or logins for learners. On shared devices, a learner picks a nickname or picture, never a real full name.
-- **Learner progress** (skills practised, mastery, answers) is stored only on the device, in a local database. It must be easy for a teacher or parent to view and reset, and it must never be sent anywhere.
+- No accounts or logins for learners. On shared devices, a learner picks a nickname or picture, never a real full name. The API enforces this as far as it can: nicknames are letters only (1–20), so phone numbers and email addresses are rejected.
+- **Learner progress** (skills practised, mastery, answers) is stored only on the device, in a local SQLite file (`backend/data/math_tutor.db` by default). It must never be sent anywhere. Teachers and parents can view it (`GET /api/learners/{id}/progress`), reset it (`DELETE /api/learners/{id}/progress`), or delete the learner and everything about them (`DELETE /api/learners/{id}`). Deleting the file removes all learner data on the device.
+- There are no passwords, so anyone using the device can view or reset progress. That suits a shared family or classroom device, and keeps children's details out of the system entirely.
 - Never commit real learner data, photos or voice recordings to this repository.
 
 ## Reporting a concern

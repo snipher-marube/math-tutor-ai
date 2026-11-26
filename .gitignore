@@ -10,6 +10,12 @@ venv/
 .env.*
 !.env.example
 
+# Local learner data (never commit it)
+backend/data/
+*.db
+*.db-wal
+*.db-shm
+
 # Node
 node_modules/
 dist/

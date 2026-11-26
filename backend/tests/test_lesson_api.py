@@ -4,21 +4,18 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app
-from routers.lesson import get_store
+from services.learners import LearnerStore
 from services.problem_store import ProblemStore
 from services.problems import Problem
 
 
 @pytest.fixture
-def store():
-    fresh = ProblemStore()
-    app.dependency_overrides[get_store] = lambda: fresh
-    yield fresh
-    app.dependency_overrides.pop(get_store, None)
+def store(db):
+    return ProblemStore(db)
 
 
 @pytest.fixture
-def client(store):
+def client():
     return TestClient(app)
 
 
@@ -111,7 +108,7 @@ def test_praises_effort_after_mistakes(client, store):
     assert body["correct"] is True
     assert body["attempts"] == 2
     assert "kept trying" in body["feedback"]
-    assert store.get(pid).given_answers == [75, 12]
+    assert store.get(pid).given_answers == (75, 12)
 
 
 def test_unknown_problem_is_404(client):
@@ -188,19 +185,43 @@ def test_full_flow_for_every_skill(client, store):
         assert last["correct"] is True and last["attempts"] == 2
 
 
+# --- Learners -------------------------------------------------------------------
+
+
+def test_problem_for_a_learner_is_recorded(client, store, db):
+    learner = LearnerStore(db).create("Simba")
+    res = client.post(
+        "/api/lesson/problems", json={"skill_id": "add-within-10", "learner_id": learner.id}
+    )
+    assert res.status_code == 201
+    assert store.get(res.json()["id"]).learner_id == learner.id
+
+
+def test_problem_without_a_learner_is_anonymous(client, store):
+    res = client.post("/api/lesson/problems", json={"skill_id": "add-within-10"})
+    assert store.get(res.json()["id"]).learner_id is None
+
+
+def test_unknown_learner_is_404(client):
+    res = client.post("/api/lesson/problems", json={"skill_id": "add-within-10", "learner_id": 999})
+    assert res.status_code == 404
+    assert "Unknown learner" in res.json()["detail"]
+
+
 # --- Store ----------------------------------------------------------------------
 
 
-def test_store_forgets_oldest_problems_when_full():
-    small = ProblemStore(max_size=2)
-    first = small.add(SEVEN_PLUS_FIVE).id
-    small.add(SEVEN_PLUS_FIVE)
-    small.add(SEVEN_PLUS_FIVE)
-    assert len(small) == 2
-    assert small.get(first) is None
+def test_problems_and_answers_survive_a_restart(db):
+    """A new store on the same file (like a server restart) still knows the problem."""
+    pid = ProblemStore(db).add(SEVEN_PLUS_FIVE).id
+    ProblemStore(db).record_attempt(pid, 75, False, "joined-digits")
+
+    after_restart = ProblemStore(type(db)(db.path)).get(pid)
+    assert after_restart.problem == SEVEN_PLUS_FIVE
+    assert after_restart.given_answers == (75,)
+    assert not after_restart.solved
 
 
-def test_store_ids_are_unique():
-    store = ProblemStore()
-    ids = {store.add(SEVEN_PLUS_FIVE).id for _ in range(1000)}
-    assert len(ids) == 1000
+def test_store_ids_are_unique(store):
+    ids = {store.add(SEVEN_PLUS_FIVE).id for _ in range(500)}
+    assert len(ids) == 500

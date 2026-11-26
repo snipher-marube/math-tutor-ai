@@ -5,7 +5,9 @@ Flow for one problem:
   2. POST /api/lesson/problems/{id}/answer {"answer": ...}   -> correct? feedback, hint step
   3. GET  /api/lesson/problems/{id}/hints?start=...          -> the hint ladder
 
-No AI is used. See docs/PEDAGOGY.md and docs/API.md.
+Pass a `learner_id` when asking for a problem to record the answers in that learner's
+progress. Without it, the problem is anonymous practice. No AI is used.
+See docs/PEDAGOGY.md and docs/API.md.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
+from dependencies import LearnerStoreDep, ProblemStoreDep
 from services.answer_checker import HintStep, check_answer
 from services.hints import hint_ladder
 from services.problem_store import ProblemStore, StoredProblem
@@ -34,15 +37,7 @@ def get_skill_map() -> SkillMap:
     return load_skill_map()
 
 
-_store = ProblemStore()
-
-
-def get_store() -> ProblemStore:
-    return _store
-
-
 SkillMapDep = Annotated[SkillMap, Depends(get_skill_map)]
-StoreDep = Annotated[ProblemStore, Depends(get_store)]
 
 
 # --- Models -----------------------------------------------------------------------
@@ -61,6 +56,9 @@ class SkillOut(BaseModel):
 
 class NewProblemIn(BaseModel):
     skill_id: str = Field(examples=["add-within-10"])
+    learner_id: int | None = Field(
+        default=None, description="Record answers in this learner's progress. Omit to practise."
+    )
 
 
 class ProblemOut(BaseModel):
@@ -138,16 +136,24 @@ async def list_skills(skill_map: SkillMapDep) -> list[SkillOut]:
     "/problems",
     response_model=ProblemOut,
     status_code=201,
-    responses={404: {"description": "Unknown skill, or no problems for this skill yet"}},
+    responses={404: {"description": "Unknown skill or learner, or no problems for this skill yet"}},
 )
-async def new_problem(body: NewProblemIn, skill_map: SkillMapDep, store: StoreDep) -> ProblemOut:
+def new_problem(
+    body: NewProblemIn,
+    skill_map: SkillMapDep,
+    store: ProblemStoreDep,
+    learners: LearnerStoreDep,
+) -> ProblemOut:
     """A new problem for a skill. The answer stays on the server."""
     if body.skill_id not in skill_map:
         raise HTTPException(404, f"Unknown skill: {body.skill_id}")
     if not has_generator(body.skill_id):
         raise HTTPException(404, f"No problems for skill {body.skill_id} yet")
+    if body.learner_id is not None and learners.get(body.learner_id) is None:
+        raise HTTPException(404, f"Unknown learner: {body.learner_id}")
 
-    stored = store.add(generate_problem(skill_map.get(body.skill_id)))
+    problem = generate_problem(skill_map.get(body.skill_id))
+    stored = store.add(problem, learner_id=body.learner_id)
     p = stored.problem
     return ProblemOut(
         id=stored.id,
@@ -161,44 +167,40 @@ async def new_problem(body: NewProblemIn, skill_map: SkillMapDep, store: StoreDe
 @router.post(
     "/problems/{problem_id}/answer",
     response_model=AnswerOut,
-    responses={404: {"description": "Problem not found (or forgotten after a restart)"}},
+    responses={404: {"description": "Problem not found"}},
 )
-async def answer_problem(problem_id: str, body: AnswerIn, store: StoreDep) -> AnswerOut:
+def answer_problem(problem_id: str, body: AnswerIn, store: ProblemStoreDep) -> AnswerOut:
     """Check the child's answer. Wrong answers get kind feedback and a hint step."""
     stored = _get_or_404(store, problem_id)
-    stored.attempts += 1
-    stored.given_answers.append(body.answer)
-
     result = check_answer(stored.problem, body.answer)
+    m = result.misconception
+    attempts = store.record_attempt(problem_id, body.answer, result.correct, m.id if m else None)
+
     if result.correct:
-        stored.solved = True
-        praise = PRAISE_FIRST_TRY if stored.attempts == 1 else PRAISE_AFTER_TRYING
         return AnswerOut(
             correct=True,
-            feedback=praise,
+            feedback=PRAISE_FIRST_TRY if attempts == 1 else PRAISE_AFTER_TRYING,
             misconception=None,
             next_hint=None,
-            attempts=stored.attempts,
+            attempts=attempts,
         )
-
-    m = result.misconception
     return AnswerOut(
         correct=False,
         feedback=m.feedback if m else NOT_YET,
         misconception=m.id if m else None,
         next_hint=m.hint if m else "nudge",
-        attempts=stored.attempts,
+        attempts=attempts,
     )
 
 
 @router.get(
     "/problems/{problem_id}/hints",
     response_model=list[HintOut],
-    responses={404: {"description": "Problem not found (or forgotten after a restart)"}},
+    responses={404: {"description": "Problem not found"}},
 )
-async def get_hints(
+def get_hints(
     problem_id: str,
-    store: StoreDep,
+    store: ProblemStoreDep,
     skill_map: SkillMapDep,
     start: HintStep = "nudge",
 ) -> list[HintOut]:

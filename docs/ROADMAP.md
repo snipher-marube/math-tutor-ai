@@ -20,7 +20,8 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] Answer checker with misconception detection for addition (see the table in [PEDAGOGY.md](PEDAGOGY.md#5-learn-from-wrong-answers-misconceptions))
 - [x] Hint ladder per problem kind: nudge, picture, worked example
 - [x] Lesson API: new problem, check answer, get hints ([API.md](API.md#lesson-api))
-- [ ] Learner progress stored locally (SQLite), with mastery rules
+- [x] Learners and progress stored locally (SQLite), with view, reset and delete
+- [ ] Mastery rules, and choosing each learner's next skill
 - [ ] Placement check to find each learner's starting level
 - [ ] Spaced review of mastered skills
 - [ ] 🟢 Add subtraction skills and misconceptions
