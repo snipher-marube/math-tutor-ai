@@ -1,7 +1,31 @@
 name: Curriculum / learning content
-description: Report a wrong answer, an unsuitable explanation, or propose new Grade 2 content
+description: Report a wrong answer or unsuitable explanation, or propose skills, common mistakes, or other Grades 1–3 content
 labels: [curriculum]
 body:
+  - type: dropdown
+    id: grade
+    attributes:
+      label: Grade
+      options:
+        - Grade 1
+        - Grade 2
+        - Grade 3
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of content is this?
+      options:
+        - Wrong or confusing tutor answer
+        - New skill, or breaking a topic into skills
+        - Common mistake children make (misconception)
+        - Sample problems
+        - Correction to docs/CURRICULUM.md
+        - Other
+    validations:
+      required: true
   - type: dropdown
     id: strand
     attributes:
@@ -32,6 +56,6 @@ body:
     id: expected
     attributes:
       label: What a good answer looks like
-      description: How would a Grade 2 teacher explain this? Cite the KICD curriculum design or learner's book if you can.
+      description: How would a teacher explain this? For a common mistake, describe what the child does and how you help them. Cite the KICD curriculum design or learner's book if you can.
     validations:
       required: true

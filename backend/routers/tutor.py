@@ -14,7 +14,7 @@ from services.ollama_client import (
 router = APIRouter(prefix="/api/tutor", tags=["tutor"])
 
 
-# Long enough for a Grade 2 word problem, short enough to keep the model fast.
+# Long enough for a Lower Primary word problem, short enough to keep the model fast.
 MAX_QUESTION_LENGTH = 500
 
 Question = Annotated[

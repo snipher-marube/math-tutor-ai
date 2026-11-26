@@ -1,10 +1,11 @@
 # Child safety and privacy guidelines
 
-Our users are about **7–8 years old**. Every contributor must follow these rules. Reviewers will check them on every PR that touches prompts, content, UI or data handling.
+Our users are Lower Primary learners (Grades 1–3), about **6–9 years old**. Many are still learning to read. Every contributor must follow these rules. Reviewers will check them on every PR that touches prompts, content, UI or data handling.
 
 ## Content
 
-- ✅ Age-appropriate, kind, encouraging language. Never shame a wrong answer.
+- ✅ Age-appropriate, kind, encouraging language. Never shame a wrong answer. Praise effort and strategy, not ability.
+- ✅ Don't rely on reading alone. Pair text with pictures and read-aloud audio where possible.
 - ✅ Inclusive examples that reflect Kenya's diversity of names, regions, genders and abilities.
 - ❌ No violence, scary themes, romance, brands or adverts, gambling (including betting examples), alcohol, religion or politics.
 - ❌ No links to external websites, and no instructions to go online.
@@ -15,13 +16,14 @@ Our users are about **7–8 years old**. Every contributor must follow these rul
 - The system prompt must keep the tutor **on maths topics**, and it should redirect off-topic questions gently.
 - The tutor must never ask for personal information (full name, school, location, phone number).
 - Treat model output as untrusted. Before shipping, check new prompts against tricky inputs: off-topic questions, rude messages, and attempts to make the tutor ignore its instructions.
-- Correctness matters. A confidently wrong answer teaches the wrong thing. Prefer verifying arithmetic in code.
+- Correctness matters. A confidently wrong answer teaches the wrong thing. Correct answers must be computed in code, and the model never decides whether a child's answer is right (see [PEDAGOGY.md](PEDAGOGY.md)).
 
 ## Data and privacy
 
 - **Everything stays on the device.** No telemetry, analytics, crash reporting, or remote logging.
 - Don't store learner questions unless a feature clearly needs it. If it does, store them locally, make deletion easy, and document it.
-- No accounts or logins for learners.
+- No accounts or logins for learners. On shared devices, a learner picks a nickname or picture, never a real full name.
+- **Learner progress** (skills practised, mastery, answers) is stored only on the device, in a local database. It must be easy for a teacher or parent to view and reset, and it must never be sent anywhere.
 - Never commit real learner data, photos or voice recordings to this repository.
 
 ## Reporting a concern
