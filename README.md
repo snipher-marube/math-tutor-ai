@@ -91,6 +91,7 @@ No `make`? Platform-specific steps (including Windows) are in **[docs/SETUP.md](
 | `make lint`     | Check code style                     |
 | `make format`   | Auto-format code                     |
 | `make skills`   | Check the skill map files            |
+| `make problems` | Print sample problems for each skill |
 | `make build`    | Production build of the frontend     |
 
 ## Project structure
@@ -101,7 +102,7 @@ math-tutor-ai/
 │   ├── main.py              App entry point, CORS, health routes
 │   ├── config.py            Settings (env vars / .env)
 │   ├── routers/tutor.py     /api/tutor endpoints
-│   ├── services/            Ollama client, math verifier, skill map loader
+│   ├── services/            Ollama client, math verifier, skill map, problem generators
 │   ├── skills/              Skill map: one YAML file per CBE sub-strand
 │   └── tests/               Pytest tests (Ollama is mocked)
 ├── frontend/                Vue 3 + Vite web app
