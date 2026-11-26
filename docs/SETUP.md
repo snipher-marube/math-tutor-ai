@@ -86,5 +86,6 @@ git push origin main
 | `503 Model ... is not installed` | Run `ollama pull qwen2.5:1.5b`, or set `OLLAMA_MODEL` to a model shown by `ollama list` |
 | Browser shows a CORS error | Add your frontend URL to `CORS_ORIGINS` in `backend/.env` (it takes a JSON list) |
 | `ModuleNotFoundError` when running the backend | Run commands from inside `backend/` with `uv run ...` |
+| `504 The tutor took longer than ... seconds` | The machine is slow or the model is still loading. Retry, raise `OLLAMA_TIMEOUT` in `.env`, or use a smaller model |
 | Responses are very slow | Try a smaller model (`qwen2.5:0.5b`) and close other heavy apps. The first request is slower while the model loads |
 | `uv: command not found` | Install uv (see the link above), then restart your terminal |

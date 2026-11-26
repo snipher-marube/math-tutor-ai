@@ -44,6 +44,10 @@ curl -X POST http://localhost:8000/api/tutor/ask \
   ```json
   { "detail": "Model 'qwen2.5:1.5b' is not installed. Run `ollama pull qwen2.5:1.5b`." }
   ```
+- `504`: the model took longer than `OLLAMA_TIMEOUT` seconds to answer:
+  ```json
+  { "detail": "The tutor took longer than 120 seconds to answer. Try again, use a smaller model, or raise OLLAMA_TIMEOUT." }
+  ```
 
 ## Configuration
 
@@ -53,5 +57,6 @@ Set these as environment variables or in `backend/.env` (see `backend/.env.examp
 | --- | --- | --- |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Where Ollama is listening |
 | `OLLAMA_MODEL` | `qwen2.5:1.5b` | Model tag passed to Ollama |
+| `OLLAMA_TIMEOUT` | `120` | Max seconds to wait for a model reply before returning `504` |
 | `GRADE_LEVEL` | `2` | Default grade level |
 | `CORS_ORIGINS` | `["http://localhost:5173"]` | JSON list of allowed frontend origins |
