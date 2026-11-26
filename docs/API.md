@@ -21,8 +21,8 @@ Ask the tutor a maths question.
 
 | Field | Type | Required | Default | Notes |
 | --- | --- | --- | --- | --- |
-| `question` | string | yes | — | The learner's question |
-| `grade` | integer | no | `2` | Grade level used in the prompt |
+| `question` | string | yes | — | The learner's question. 1–500 characters after trimming surrounding spaces |
+| `grade` | integer | no | `GRADE_LEVEL` (`2`) | Grade level used in the prompt. Must be 1–3 |
 
 ```bash
 curl -X POST http://localhost:8000/api/tutor/ask \
@@ -36,7 +36,7 @@ curl -X POST http://localhost:8000/api/tutor/ask \
 ```
 
 **Errors**
-- `422`: the body is invalid (for example, `question` is missing).
+- `422`: the body is invalid: `question` is missing, empty, only spaces, or over 500 characters, or `grade` is outside 1–3. The model isn't called.
 - `503`: the local model can't be used. The `detail` field says why and how to fix it:
   ```json
   { "detail": "Cannot reach Ollama at http://localhost:11434. Is it running? (`ollama serve`)" }
@@ -58,5 +58,5 @@ Set these as environment variables or in `backend/.env` (see `backend/.env.examp
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Where Ollama is listening |
 | `OLLAMA_MODEL` | `qwen2.5:1.5b` | Model tag passed to Ollama |
 | `OLLAMA_TIMEOUT` | `120` | Max seconds to wait for a model reply before returning `504` |
-| `GRADE_LEVEL` | `2` | Default grade level |
+| `GRADE_LEVEL` | `2` | Grade used when a request doesn't send one. Must be 1–3 |
 | `CORS_ORIGINS` | `["http://localhost:5173"]` | JSON list of allowed frontend origins |
