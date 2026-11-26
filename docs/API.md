@@ -37,7 +37,13 @@ curl -X POST http://localhost:8000/api/tutor/ask \
 
 **Errors**
 - `422`: the body is invalid (for example, `question` is missing).
-- `500`: usually means Ollama isn't running or the model isn't installed. See [SETUP.md](SETUP.md#troubleshooting).
+- `503`: the local model can't be used. The `detail` field says why and how to fix it:
+  ```json
+  { "detail": "Cannot reach Ollama at http://localhost:11434. Is it running? (`ollama serve`)" }
+  ```
+  ```json
+  { "detail": "Model 'qwen2.5:1.5b' is not installed. Run `ollama pull qwen2.5:1.5b`." }
+  ```
 
 ## Configuration
 

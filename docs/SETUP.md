@@ -82,8 +82,8 @@ git push origin main
 
 | Problem | Fix |
 | --- | --- |
-| `httpx.ConnectError` / connection refused on `/api/tutor/ask` | Ollama isn't running. Run `ollama serve`, and check `OLLAMA_BASE_URL` in `.env` |
-| `model "qwen2.5:1.5b" not found` | Run `ollama pull qwen2.5:1.5b`, or set `OLLAMA_MODEL` to a model shown by `ollama list` |
+| `503 Cannot reach Ollama` on `/api/tutor/ask` | Ollama isn't running. Run `ollama serve`, and check `OLLAMA_BASE_URL` in `.env` |
+| `503 Model ... is not installed` | Run `ollama pull qwen2.5:1.5b`, or set `OLLAMA_MODEL` to a model shown by `ollama list` |
 | Browser shows a CORS error | Add your frontend URL to `CORS_ORIGINS` in `backend/.env` (it takes a JSON list) |
 | `ModuleNotFoundError` when running the backend | Run commands from inside `backend/` with `uv run ...` |
 | Responses are very slow | Try a smaller model (`qwen2.5:0.5b`) and close other heavy apps. The first request is slower while the model loads |

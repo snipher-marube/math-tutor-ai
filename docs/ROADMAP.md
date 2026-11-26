@@ -5,7 +5,7 @@ This is a living plan. Each item should become a GitHub issue. Items marked 🟢
 ## v0.2: Usable MVP
 - [ ] Child-friendly chat UI in `frontend/` that replaces the Vite starter page (big buttons, large fonts, colourful)
 - [ ] 🟢 Frontend: call `POST /api/tutor/ask` and show a loading state
-- [ ] 🟢 Backend: return a friendly `503` when Ollama is unreachable, instead of a 500
+- [x] 🟢 Backend: return a friendly `503` when Ollama is unreachable, instead of a 500
 - [ ] 🟢 Backend: use `ollama.AsyncClient` so requests don't block the event loop
 - [ ] 🟢 Validate input: limit question length and reject empty strings
 - [ ] Move the system prompt into its own file (`backend/prompts/`) so non-developers can edit it

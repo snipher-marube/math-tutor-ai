@@ -60,6 +60,5 @@ Ollama serves a quantised small language model over a local HTTP API. Models are
 - The Ollama call is synchronous inside an async route, so it blocks the event loop under concurrent use.
 - There's no answer verification yet, so the model can be wrong.
 - There's no conversation memory. Each question stands alone.
-- There's no error handling when Ollama is down (you get a 500 instead of a friendly message).
 
 These are all tracked in [ROADMAP.md](ROADMAP.md) and are good contributor tasks.
