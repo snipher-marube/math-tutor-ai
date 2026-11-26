@@ -1,6 +1,7 @@
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +19,17 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
     # Local SQLite file for learners and progress. Never leaves the device.
     DATABASE_PATH: Path = Path(__file__).resolve().parent / "data" / "math_tutor.db"
+    # Time zone for counting "different days" in the mastery rule.
+    TIMEZONE: str = "Africa/Nairobi"
+
+    @field_validator("TIMEZONE")
+    @classmethod
+    def _known_timezone(cls, value: str) -> str:
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise ValueError(f"Unknown time zone: {value!r} (example: Africa/Nairobi)") from None
+        return value
 
 
 settings = Settings()

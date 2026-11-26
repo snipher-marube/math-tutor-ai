@@ -102,12 +102,24 @@ Errors: `409` if the nickname is taken, `422` for an invalid nickname or avatar.
 List all learners (by nickname), or get one.
 
 ### `GET /api/learners/{id}/progress`
-Totals for each skill the learner has practised, most recent first.
+Totals and mastery for each skill the learner has practised, most recent first.
 ```json
-[{ "skill_id": "add-within-10", "problems": 1, "attempts": 2, "correct": 1,
-   "last_practised": "2026-11-26T11:57:30+00:00" }]
+[{ "skill_id": "count-to-20", "status": "mastered",
+   "problems": 5, "attempts": 6, "correct": 5,
+   "recent_total": 5, "recent_correct": 4, "correct_days": 2,
+   "last_practised": "2026-11-25T08:00:00+00:00" }]
 ```
-Mastery ("has Simba mastered this skill?") comes in the next PR.
+- `status`: `practising` or `mastered`. Mastered means at least 4 of the last 5 problems were right **on the first try**, on at least 2 different local days (see [PEDAGOGY.md](PEDAGOGY.md#1-skill-map-and-mastery)).
+- `problems`, `attempts` and `correct` are all-time totals, **including** retries.
+- `recent_total`, `recent_correct` and `correct_days` show the numbers behind `status`, using first answers only.
+
+### `GET /api/learners/{id}/next-skill`
+The skill this learner should work on next: the first skill in teaching order that isn't mastered yet and whose prerequisites are all mastered.
+```json
+{ "skill_id": "add-within-10", "name": "Add within 10", "grade": 1,
+  "status": "not-started", "reason": "Ready to start: all the skills it needs are mastered." }
+```
+A new learner gets the first skill (`count-to-20`). When every skill is mastered, `skill_id` is `null` and `reason` says so.
 
 ### `DELETE /api/learners/{id}/progress`
 Delete all of the learner's problems and answers, but keep the learner. Returns `204`.
@@ -162,3 +174,4 @@ Set these as environment variables or in `backend/.env` (see `backend/.env.examp
 | `GRADE_LEVEL` | `2` | Grade used when a request doesn't send one. Must be 1–3 |
 | `CORS_ORIGINS` | `["http://localhost:5173"]` | JSON list of allowed frontend origins |
 | `DATABASE_PATH` | `backend/data/math_tutor.db` | Local SQLite file for learners and progress. Never commit it |
+| `TIMEZONE` | `Africa/Nairobi` | Time zone for counting "different days" in the mastery rule. Must be a valid zone name |

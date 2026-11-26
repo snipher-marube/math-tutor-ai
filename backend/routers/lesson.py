@@ -13,31 +13,17 @@ See docs/PEDAGOGY.md and docs/API.md.
 from __future__ import annotations
 
 import random
-from functools import lru_cache
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from dependencies import LearnerStoreDep, ProblemStoreDep
+from dependencies import LearnerStoreDep, ProblemStoreDep, SkillMapDep
 from services.answer_checker import HintStep, check_answer
 from services.hints import hint_ladder
 from services.problem_store import ProblemStore, StoredProblem
 from services.problems import generate_problem, has_generator
-from services.skill_map import SkillMap, load_skill_map
 
 router = APIRouter(prefix="/api/lesson", tags=["lesson"])
-
-
-# --- Dependencies (overridden in tests) -------------------------------------------
-
-
-@lru_cache
-def get_skill_map() -> SkillMap:
-    return load_skill_map()
-
-
-SkillMapDep = Annotated[SkillMap, Depends(get_skill_map)]
 
 
 # --- Models -----------------------------------------------------------------------

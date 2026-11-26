@@ -11,6 +11,15 @@ import sqlite3
 from dataclasses import dataclass
 
 from services.db import Database, now
+from services.mastery import FirstAnswer
+
+# The first answer to each of a learner's problems.
+FIRST_ANSWERS_SQL = """
+    SELECT p.skill_id, a.correct, a.created_at
+    FROM problems p
+    JOIN attempts a ON a.id = (SELECT MIN(id) FROM attempts WHERE problem_id = p.id)
+    WHERE p.learner_id = ?
+"""
 
 AVATARS = ("lion", "elephant", "giraffe", "zebra", "cheetah", "rhino", "hippo", "monkey")
 
@@ -89,6 +98,19 @@ class LearnerStore:
                 (learner_id,),
             )
             return [SkillProgress(**dict(r)) for r in rows]
+
+    def first_answers(self, learner_id: int) -> dict[str, list[FirstAnswer]]:
+        """The first answer to each of the learner's problems, grouped by skill.
+
+        Problems with no answer yet are left out.
+        """
+        by_skill: dict[str, list[FirstAnswer]] = {}
+        with self._db.connect() as conn:
+            for row in conn.execute(FIRST_ANSWERS_SQL, (learner_id,)):
+                by_skill.setdefault(row["skill_id"], []).append(
+                    FirstAnswer(bool(row["correct"]), row["created_at"])
+                )
+        return by_skill
 
 
 def _learner(row: sqlite3.Row) -> Learner:
