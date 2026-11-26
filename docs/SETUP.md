@@ -53,6 +53,8 @@ npm ci
 npm run dev                # http://localhost:5173
 ```
 
+Open http://localhost:5173, make a learner card, and try a lesson. Vite sends `/api` requests to the backend on port 8000. If your backend runs elsewhere, start Vite with `VITE_API_TARGET=http://localhost:8001 npm run dev`.
+
 ## 6. Run the checks
 
 ```bash

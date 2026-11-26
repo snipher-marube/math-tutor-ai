@@ -72,6 +72,8 @@ Follow the [Quick start](README.md#quick-start) or the detailed [docs/SETUP.md](
 - Vue 3 with `<script setup>` and Vite. Use npm and commit `package-lock.json`.
 - No external fonts, CDNs or remote images. Bundle every asset so the app works offline.
 - Design for children: large touch targets, high contrast, minimal text, and no ads or links to the internet.
+- Never show an answer before the child gives it (for example, keep a number line's `blank` box empty). See [frontend/README.md](frontend/README.md) for the app's structure and rules.
+- There are no frontend tests yet (it's on the roadmap). Check UI changes in a browser, at phone width too, and include screenshots in your PR.
 
 ### Teaching engine, skills and misconceptions
 

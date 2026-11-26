@@ -72,7 +72,7 @@ The hint ladder, from `start` (`nudge`, `picture` or `worked-example`) onwards. 
    "example": null },
  { "step": "worked-example", "text": "Here's one I solved. Now you try yours the same way.",
    "visual": null,
-   "example": { "question": "41 + 19 = ?",
+   "example": { "kind": "add", "question": "41 + 19 = ?", "operands": [41, 19],
                 "steps": ["Ones: 1 + 9 = 10. That's 1 ten and 0 ones.",
                           "Tens: 4 + 1 = 5, plus the new ten is 6.",
                           "6 tens and 0 ones is 60.", "So 41 + 19 = 60."] } }]

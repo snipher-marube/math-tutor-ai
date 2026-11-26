@@ -79,7 +79,9 @@ class VisualOut(BaseModel):
 
 
 class WorkedExampleOut(BaseModel):
+    kind: str
     question: str
+    operands: list[int] = Field(description="The example's numbers, for drawing its visual")
     steps: list[str]
 
 
@@ -200,7 +202,12 @@ def get_hints(
             text=h.text,
             visual=VisualOut(type=h.visual.type, params=h.visual.params) if h.visual else None,
             example=(
-                WorkedExampleOut(question=h.example.problem.question, steps=list(h.example.steps))
+                WorkedExampleOut(
+                    kind=h.example.problem.kind,
+                    question=h.example.problem.question,
+                    operands=list(h.example.problem.operands),
+                    steps=list(h.example.steps),
+                )
                 if h.example
                 else None
             ),
