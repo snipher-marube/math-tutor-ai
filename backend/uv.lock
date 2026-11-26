@@ -752,6 +752,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "ollama" },
     { name = "pydantic-settings" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -765,6 +766,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.165.0" },
     { name = "ollama", specifier = ">=0.6.3" },
     { name = "pydantic-settings", specifier = ">=2.16.3" },
+    { name = "pyyaml", specifier = ">=6.0.4" },
 ]
 
 [package.metadata.requires-dev]

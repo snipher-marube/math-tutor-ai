@@ -34,7 +34,7 @@ A teaching engine written in code drives learning. The small AI model is a helpe
 
 | Component | Responsibility | Status |
 | --- | --- | --- |
-| Skill map | Ordered skills per CBE sub-strand, with prerequisites, stored as data files teachers can review | Planned (v0.3) |
+| Skill map | Ordered skills per CBE sub-strand, with prerequisites, stored as data files teachers can review | Built: `skills/*.yaml`, `services/skill_map.py` ([SKILLS.md](SKILLS.md)) |
 | Problem generator | Creates problems for a skill. The correct answer is computed in code | Planned (v0.3) |
 | Answer checker | Marks answers and recognises common misconceptions | Planned (v0.3) |
 | Hint ladder | Nudge, then picture, then worked example, then a new try | Planned (v0.3) |
@@ -67,6 +67,8 @@ Today the backend provides the free-question mode only. The frontend is still th
 | `routers/tutor.py` | HTTP layer: request validation, response models, and the `/api/tutor/*` routes |
 | `services/ollama_client.py` | Builds the system prompt and calls the local model through Ollama, with timeout and error handling |
 | `services/math_verifier.py` | Works out the answer to simple arithmetic questions in code and checks the model's answer |
+| `services/skill_map.py` | Loads and checks the skill map in `skills/*.yaml`. Not used by an endpoint yet |
+| `skills/` | Skill map data files, one per CBE sub-strand ([SKILLS.md](SKILLS.md)) |
 | `tests/` | Pytest suite. The model is always faked |
 
 **Rule of thumb:** routers don't talk to Ollama directly, and services don't know about HTTP. This keeps the model swappable and the logic testable. The lesson engine will follow the same rule.

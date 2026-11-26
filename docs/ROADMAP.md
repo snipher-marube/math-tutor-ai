@@ -15,7 +15,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [ ] Move the system prompt into its own file (`backend/prompts/`) so non-developers can edit it
 
 ## v0.3: Teaching engine (no AI needed)
-- [ ] Skill map format (data files) with prerequisites, plus the first skills: Grade 1–2 addition
+- [x] Skill map format (data files) with prerequisites, plus the first skills: Grade 1–2 addition ([SKILLS.md](SKILLS.md))
 - [ ] Problem generator per skill. Every problem has a correct answer computed in code
 - [ ] Answer checker with misconception detection for addition (see the table in [PEDAGOGY.md](PEDAGOGY.md#5-learn-from-wrong-answers-misconceptions))
 - [ ] Hint ladder data per skill: nudge, picture, worked example

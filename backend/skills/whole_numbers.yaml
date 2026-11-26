@@ -1,0 +1,42 @@
+# Skills for the CBE sub-strand "Whole numbers" (strand: Numbers).
+# How to read and edit this file: see docs/SKILLS.md
+
+strand: numbers
+substrand: whole-numbers
+
+skills:
+  - id: count-to-20
+    name: Count objects to 20
+    grade: 1
+    requires: []
+    numbers: { min: 0, max: 20 }
+    description: >
+      Count a group of objects one by one, saying one number for each object,
+      and know that the last number said is how many there are.
+    examples:
+      - How many mangoes are there? (picture of 7 mangoes)
+      - Count the stars. (picture of 15 stars)
+
+  - id: count-to-100
+    name: Count and read numbers to 100
+    grade: 1
+    requires: [count-to-20]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Count forwards and backwards to 100, read and write numbers to 100,
+      and say the number that comes before or after.
+    examples:
+      - What number comes after 39?
+      - Count on from 56 to 62.
+
+  - id: place-value-tens-ones
+    name: Tens and ones
+    grade: 2
+    requires: [count-to-100]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Understand that a two-digit number is made of tens and ones,
+      for example 34 is 3 tens and 4 ones.
+    examples:
+      - How many tens and how many ones are in 47?
+      - 6 tens and 2 ones make what number?
