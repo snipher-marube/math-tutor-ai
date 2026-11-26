@@ -44,7 +44,7 @@ Ollama serves a quantised small language model over a local HTTP API. Models are
 
 1. The frontend sends `POST /api/tutor/ask` with `{"question": "...", "grade": 2}`.
 2. `routers/tutor.py` validates the body and calls `generate_tutor_response()`.
-3. The service builds a Grade 2, CBE, Kenyan-context system prompt and calls `client.chat()` on Ollama.
+3. The service builds a Grade 2, CBE, Kenyan-context system prompt and awaits `AsyncClient.chat()` on Ollama, so other requests keep being served while the model thinks.
 4. The model's text comes back as `{"explanation": "..."}`.
 
 ## Design principles
@@ -57,7 +57,6 @@ Ollama serves a quantised small language model over a local HTTP API. Models are
 
 ## Known limitations (v0.1)
 
-- The Ollama call is synchronous inside an async route, so it blocks the event loop under concurrent use.
 - There's no answer verification yet, so the model can be wrong.
 - There's no conversation memory. Each question stands alone.
 

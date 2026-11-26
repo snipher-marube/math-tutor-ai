@@ -1,4 +1,4 @@
-from ollama import Client, ResponseError
+from ollama import AsyncClient, ResponseError
 
 from config import settings
 
@@ -7,16 +7,17 @@ class TutorUnavailableError(Exception):
     """Raised when the local model can't be reached or isn't installed."""
 
 
-def generate_tutor_response(question: str, grade: int = 2) -> str:
+async def generate_tutor_response(question: str, grade: int = 2) -> str:
     system_prompt = (
         f"You are a friendly math tutor for a Kenyan Grade {grade} student "
         "using the CBE curriculum. Use simple English and real-life examples "
         "like mangoes or shillings. Show your steps, then end with '= <answer>'."
     )
 
-    client = Client(host=settings.OLLAMA_BASE_URL)
+    # Async client so a slow model reply doesn't block other requests.
+    client = AsyncClient(host=settings.OLLAMA_BASE_URL)
     try:
-        response = client.chat(
+        response = await client.chat(
             model=settings.OLLAMA_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -34,6 +35,8 @@ def generate_tutor_response(question: str, grade: int = 2) -> str:
                 f"Run `ollama pull {settings.OLLAMA_MODEL}`."
             ) from e
         raise
+    finally:
+        await client.close()
 
     content = response.message.content
     return content if content is not None else ""

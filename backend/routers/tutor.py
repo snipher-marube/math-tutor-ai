@@ -27,7 +27,7 @@ class TutorResponse(BaseModel):
 )
 async def ask_tutor(req: TutorRequest):
     try:
-        explanation = generate_tutor_response(req.question, req.grade)
+        explanation = await generate_tutor_response(req.question, req.grade)
     except TutorUnavailableError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     result = verify(req.question, explanation)
