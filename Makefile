@@ -20,8 +20,9 @@ backend: ## Run the API on http://localhost:8000 (auto-reload)
 frontend: ## Run the web app on http://localhost:5173
 	cd frontend && npm run dev
 
-test: ## Run backend tests
+test: ## Run backend and frontend tests
 	cd backend && uv run pytest
+	cd frontend && npm test
 
 lint: ## Check backend code style
 	cd backend && uv run ruff check . && uv run ruff format --check .

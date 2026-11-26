@@ -1,8 +1,10 @@
 <script setup>
 // One problem at a time: answer with the number pad, get kind feedback,
 // ask for hints, and move on. The answer is checked by the backend.
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { AVATARS, api } from '../lib/api.js'
+import { releaseFocusAfterPointer } from '../lib/focus.js'
+import { readAloud, setReadAloud, speak, speechAvailable, stop, toSpeech } from '../lib/speech.js'
 import HintPanel from './HintPanel.vue'
 import NumberPad from './NumberPad.vue'
 import ProblemVisual from './ProblemVisual.vue'
@@ -50,6 +52,7 @@ async function nextProblem() {
     result.value = null
     hintStart.value = null
     feedback.value = newSkill.value ? `New skill: ${newSkill.value}!` : ''
+    speak(newSkill.value ? `New skill! ${problem.value.question}` : problem.value.question)
   } catch (e) {
     error.value = e.message
   } finally {
@@ -64,6 +67,7 @@ async function check() {
     const given = Number(answer.value)
     result.value = await api.answer(problem.value.id, given)
     feedback.value = result.value.feedback
+    speak(result.value.feedback)
     if (!result.value.correct) answer.value = ''
   } catch (e) {
     error.value = e.message
@@ -76,7 +80,12 @@ function showHints() {
   hintStart.value = result.value?.next_hint ?? 'nudge'
 }
 
+function sayQuestion() {
+  speak(problem.value.question, { force: true })
+}
+
 onMounted(nextProblem)
+onBeforeUnmount(stop)
 </script>
 
 <template>
@@ -86,7 +95,17 @@ onMounted(nextProblem)
         <span aria-hidden="true">{{ AVATARS[learner.avatar] ?? '🙂' }}</span>
         {{ learner.nickname }}
       </span>
-      <button type="button" @click="emit('change-learner')">Change learner</button>
+      <span class="controls">
+        <button
+          v-if="speechAvailable"
+          type="button"
+          :aria-pressed="readAloud ? 'true' : 'false'"
+          @click="setReadAloud(!readAloud), releaseFocusAfterPointer($event)"
+        >
+          <span aria-hidden="true">{{ readAloud ? '🔊' : '🔇' }}</span> Read aloud
+        </button>
+        <button type="button" @click="emit('change-learner')">Change learner</button>
+      </span>
     </header>
 
     <!-- One polite live region for feedback, so screen readers announce it. -->
@@ -108,9 +127,20 @@ onMounted(nextProblem)
         {{ skill.name }}
       </p>
 
-      <h1 class="question" :aria-label="`Question: ${problem.question.replace('?', 'what')}`">
-        {{ problem.question }}
-      </h1>
+      <div class="question-row">
+        <h1 class="question" :aria-label="`Question: ${toSpeech(problem.question)}`">
+          {{ problem.question }}
+        </h1>
+        <button
+          v-if="speechAvailable"
+          type="button"
+          class="say"
+          aria-label="Read the question aloud"
+          @click="sayQuestion(), releaseFocusAfterPointer($event)"
+        >
+          🔊
+        </button>
+      </div>
 
       <ProblemVisual v-if="problemVisual" :visual="problemVisual" />
 
@@ -156,6 +186,33 @@ onMounted(nextProblem)
   justify-content: space-between;
   align-items: center;
   gap: 0.6rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.controls button[aria-pressed='true'] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.question-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.say {
+  font-size: 1.6rem;
+  border-radius: 50%;
+  padding: 0;
+  inline-size: 3.4rem;
+  block-size: 3.4rem;
 }
 
 .who {

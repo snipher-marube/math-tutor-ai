@@ -2,6 +2,7 @@
 // Big number buttons for children who are still learning to type.
 // On a laptop, the number keys, Backspace and Enter work too.
 import { onBeforeUnmount, onMounted } from 'vue'
+import { releaseFocusAfterPointer } from '../lib/focus.js'
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -39,13 +40,27 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
 <template>
   <div class="pad" role="group" aria-label="Number pad">
-    <button v-for="d in [1, 2, 3, 4, 5, 6, 7, 8, 9]" :key="d" type="button" :disabled="disabled" @click="press(d)">
+    <button
+      v-for="d in [1, 2, 3, 4, 5, 6, 7, 8, 9]"
+      :key="d"
+      type="button"
+      :disabled="disabled"
+      @click="press(d), releaseFocusAfterPointer($event)"
+    >
       {{ d }}
     </button>
-    <button type="button" class="erase" :disabled="disabled || modelValue === ''" aria-label="Delete" @click="erase">
+    <button
+      type="button"
+      class="erase"
+      :disabled="disabled || modelValue === ''"
+      aria-label="Delete"
+      @click="erase(), releaseFocusAfterPointer($event)"
+    >
       ⌫
     </button>
-    <button type="button" :disabled="disabled" @click="press(0)">0</button>
+    <button type="button" :disabled="disabled" @click="press(0), releaseFocusAfterPointer($event)">
+      0
+    </button>
     <button type="button" class="primary check" :disabled="disabled || modelValue === ''" @click="submit">
       Check
     </button>

@@ -11,6 +11,8 @@ Vue 3 + Vite web app for learners: pick or create a nickname, then practise one 
 | `src/components/HintPanel.vue` | The hint ladder, one step at a time |
 | `src/components/ProblemVisual.vue` | Draws counters, ten-frames, number lines and tens-and-ones blocks |
 | `src/lib/api.js` | Calls the backend at `/api` |
+| `src/lib/speech.js` | Read-aloud: turns maths into words and speaks with an on-device voice |
+| `src/lib/focus.js` | Takes focus off a button after a mouse or touch click, so Enter always checks the answer |
 
 ```bash
 npm ci
@@ -29,3 +31,6 @@ Rules for this app:
 - **For children aged 6–9:** big touch targets (at least 48px, 56px on touch screens), high contrast, light and dark mode, and short text.
 - **Never show the answer before the child gives it.** A number line's `blank` box stays empty, and `misconception` ids are for teachers, not children.
 - **Accessible:** real `<button>`s and labelled inputs, one polite live region for feedback, and visible focus outlines.
+- **Read-aloud uses on-device English voices only.** Windows, Android, macOS, iOS and Chromebooks include them. On Linux, install speech packages (for example `speech-dispatcher` and `espeak-ng`), or the 🔊 buttons stay hidden. The on/off choice is saved on the device.
+
+Run the tests with `npm test`.

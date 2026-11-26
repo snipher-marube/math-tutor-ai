@@ -21,6 +21,7 @@ Our users are Lower Primary learners (Grades 1–3), about **6–9 years old**. 
 ## Data and privacy
 
 - **Everything stays on the device.** No telemetry, analytics, crash reporting, or remote logging.
+- **Read-aloud uses on-device voices only.** Online voices (such as Chrome's "Google" voices) send the text to a server, so they are never used.
 - Don't store learner questions unless a feature clearly needs it. If it does, store them locally, make deletion easy, and document it.
 - No accounts or logins for learners. On shared devices, a learner picks a nickname or picture, never a real full name. The API enforces this as far as it can: nicknames are letters only (1–20), so phone numbers and email addresses are rejected.
 - **Learner progress** (skills practised, mastery, answers) is stored only on the device, in a local SQLite file (`backend/data/math_tutor.db` by default). It must never be sent anywhere. Teachers and parents can view it (`GET /api/learners/{id}/progress`), reset it (`DELETE /api/learners/{id}/progress`), or delete the learner and everything about them (`DELETE /api/learners/{id}`). Deleting the file removes all learner data on the device.

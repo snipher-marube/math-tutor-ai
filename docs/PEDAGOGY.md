@@ -128,7 +128,7 @@ The built rules, with their feedback, are in `backend/services/answer_checker.py
 - **Praise effort and strategy** ("You kept trying!", "You used the number line!"), not ability ("You're so smart").
 
 ### 7. Built for children who can't read well yet
-- **Read everything aloud** with offline text-to-speech.
+- **Read everything aloud** with offline text-to-speech. The question is read when it appears, feedback after each answer, and each hint as it opens. A 🔊 button repeats the question, and maths is spoken as a teacher would say it ("6 plus what equals 10").
 - **Pictures before text.** Keep words to a minimum.
 - **Answer by tapping** big number buttons or objects, not typing.
 - **Kiswahili** alongside English.
