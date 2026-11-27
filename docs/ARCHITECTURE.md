@@ -107,7 +107,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 
 ## Known limitations (v0.2)
 
-- The lesson screen has no Kiswahili, rewards or component tests yet. Read-aloud needs an English voice installed on the device.
+- The lesson screen has no Kiswahili or rewards yet. Read-aloud needs an English voice installed on the device.
 - The verifier only checks questions written with symbols ("What is 14 + 5?"), not word problems.
 - Free questions have no conversation memory. Each question stands alone.
 

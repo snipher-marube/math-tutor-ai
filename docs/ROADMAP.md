@@ -34,7 +34,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [ ] Visual tools: Kenyan coins, and moving counters (not just tapping)
 - [x] Hint ladder in the UI
 - [x] Frontend test setup (Vitest), with tests for read-aloud text and focus handling
-- [ ] 🟢 Component tests (Vue Test Utils) for the number pad, visuals and lesson flow
+- [x] Component tests (Vue Test Utils, happy-dom) for the number pad, visuals, lesson, placement and learner screens
 - [x] Read-aloud with on-device text-to-speech (question, feedback and hints)
 - [ ] Read-aloud in Kiswahili
 - [ ] Rewards for effort and progress (stars, a skill path)

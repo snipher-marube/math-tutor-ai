@@ -36,4 +36,8 @@ Rules for this app:
 - **Accessible:** real `<button>`s and labelled inputs, one polite live region for feedback, and visible focus outlines.
 - **Read-aloud uses on-device English voices only.** Windows, Android, macOS, iOS and Chromebooks include them. On Linux, install speech packages (for example `speech-dispatcher` and `espeak-ng`), or the 🔊 buttons stay hidden. The on/off choice is saved on the device.
 
-Run the tests with `npm test`.
+Run the tests with `npm test`. They use [Vitest](https://vitest.dev) with [Vue Test Utils](https://test-utils.vuejs.org) on a small browser-like DOM ([happy-dom](https://github.com/capricorn86/happy-dom)), so no browser is needed:
+
+- `src/lib/*.test.js`: read-aloud text, focus handling, when to show the placement check, emoji picking
+- `src/components/*.test.js`: the number pad, pictures (tapping to count, take-away), the lesson, placement and learner screens, with the backend API mocked
+- `src/App.test.js`: which screen each learner sees
