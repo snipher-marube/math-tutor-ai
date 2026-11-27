@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
     # Local SQLite file for learners and progress. Never leaves the device.
     DATABASE_PATH: Path = Path(__file__).resolve().parent / "data" / "math_tutor.db"
+    # The built web app (`npm run build`). When it exists, FastAPI serves it at `/`,
+    # so the whole tutor runs as one process. See `make start`.
+    FRONTEND_DIST: Path = Path(__file__).resolve().parent.parent / "frontend" / "dist"
     # Time zone for counting "different days" in the mastery rule.
     TIMEZONE: str = "Africa/Nairobi"
 

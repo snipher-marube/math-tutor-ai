@@ -1,5 +1,5 @@
 # Common developer tasks. Run `make help` to list them.
-.PHONY: help setup model backend frontend dev test lint format build skills problems
+.PHONY: help setup model backend frontend start test lint format build skills problems
 
 OLLAMA_MODEL ?= qwen2.5:1.5b
 
@@ -38,3 +38,6 @@ problems: ## Print sample problems for every skill
 
 build: ## Build the frontend for production
 	cd frontend && npm run build
+
+start: build ## Build the app and run everything on http://localhost:8000 (one process)
+	cd backend && uv run fastapi run main.py --host 127.0.0.1 --port 8000
