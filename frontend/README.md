@@ -4,15 +4,17 @@ Vue 3 + Vite web app for learners: pick or create a nickname, then practise one 
 
 | File | What it does |
 | --- | --- |
-| `src/App.vue` | Two screens: choose a learner, then the lesson |
+| `src/App.vue` | Choose a learner, then the placement check (new learners only), then the lesson |
 | `src/components/LearnerPicker.vue` | List learners, or make a learner card (nickname and animal) |
-| `src/components/LessonView.vue` | One problem at a time: answer, feedback, hints, next problem |
+| `src/components/PlacementView.vue` | The placement check: a few questions to find where a new learner should start |
+| `src/components/LessonView.vue` | One problem at a time: answer, feedback, hints, next problem. "Check level again" re-runs the placement check |
 | `src/components/NumberPad.vue` | Big number buttons (laptop number keys, Backspace and Enter work too) |
 | `src/components/HintPanel.vue` | The hint ladder, one step at a time |
 | `src/components/ProblemVisual.vue` | Draws counters, ten-frames, number lines and tens-and-ones blocks |
 | `src/lib/api.js` | Calls the backend at `/api` |
 | `src/lib/speech.js` | Read-aloud: turns maths into words and speaks with an on-device voice |
 | `src/lib/focus.js` | Takes focus off a button after a mouse or touch click, so Enter always checks the answer |
+| `src/lib/placement.js` | Decides when a learner takes the placement check (new learners only) |
 
 ```bash
 npm ci
