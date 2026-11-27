@@ -69,7 +69,7 @@ Many Grade 3 learners are still working at a Grade 1 level in maths. A short, fr
 
 How the placement check works (`backend/services/placement.py`):
 
-- It is **short**: at most 8 problems. It asks about a skill near the middle of the skill map, then moves **up** after two right answers in a row, or **down** after one wrong answer.
+- It is **short**: at most 10 problems (about 8 on average). It asks about a skill near the middle of the skill map, then moves **up** after two right answers in a row, or **down** after one wrong answer.
 - Two right answers mark the skill **and everything it needs** as known. One wrong answer marks the skill **and everything that builds on it** as not known yet.
 - It **stops early after 3 wrong answers**, so a child who is struggling isn't put off. They simply start at the beginning.
 - The child is **not told** whether each answer was right, and there are no hints. It's for finding the right level, not for marking.
@@ -123,7 +123,11 @@ A wrong answer tells us *what* the child doesn't understand yet. The answer chec
 | 23 + 14 | 10 | Adds every digit as ones | Place-value chart: tens under tens | Built |
 | 23 + 14 | 73 | Writes the digits of the answer backwards | Point to the tens place and the ones place | Built |
 | 4 + ? = 10 | 14 | Adds the numbers shown instead of finding the missing part | Ten-frame: show the gap | Built |
-| 52 − 17 | 45 | Subtracts the smaller digit from the bigger one in each column | Base-ten blocks: break a ten into ones | Planned |
+| 52 − 17 | 45 | Subtracts the smaller digit from the bigger one in each column | Base-ten blocks: break a ten into ones | Built |
+| 53 − 17 | 46 | Breaks a ten into ones, but doesn't take it from the tens | Show the broken ten leaving the tens | Built |
+| 9 − 4 | 13 | Adds instead of taking away | Cross out the ones taken away | Built |
+| 7 − 3 | 5 | Counts the starting number when counting back | Number line: start *on* 7, then jump back 3 | Built |
+| 8 − 3 | 3 | Gives the number taken away, not what is left | Cross out 3, count the ones left | Built |
 | ½ of 8 | 2 | Confuses "half" with "quarter" | Share 8 mangoes between 2 children | Planned |
 
 The built rules, with their feedback, are in `backend/services/answer_checker.py`, alongside rules for counting, number order and place value. This list will grow, and teachers are the best people to add to it.

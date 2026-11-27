@@ -3,6 +3,7 @@
 // Types and params are described in backend/services/hints.py (Visual).
 // Things to count are friendly emoji (mangoes, goats, balls...). A child can tap
 // each one to count it: it gets a number and the number is read aloud.
+// For take-away (subtraction) pictures, the things taken away are crossed out.
 import { computed, ref } from 'vue'
 import { countOf, pickThing } from '../lib/counting.js'
 import { releaseFocusAfterPointer } from '../lib/focus.js'
@@ -29,6 +30,10 @@ const objectGroups = computed(() => {
   if ('count' in v) return [range(v.count)]
   return [range(v.first), range(v.second).map((i) => v.first + i)]
 })
+
+// Take away: the last `take` things are crossed out. They can't be tapped;
+// the child counts the ones that are left.
+const taken = (i) => 'take' in p.value && i >= p.value.count - p.value.take
 
 const counted = ref([]) // indexes in the order they were tapped
 
@@ -57,7 +62,7 @@ const frames = computed(() => {
   return range(count).map((f) =>
     range(10).map((c) => {
       const i = f * 10 + c
-      if (i < filled) return 'first'
+      if (i < filled) return i >= filled - (p.value.take ?? 0) ? 'taken' : 'first'
       if (i < filled + extra) return 'second'
       return i < size || f > 0 ? 'empty' : 'off'
     }),
@@ -85,22 +90,34 @@ const groups = computed(() => {
       { tens: v.b_tens, ones: v.b_ones },
     ]
   }
-  return [{ tens: v.tens, ones: v.ones }]
+  // Take away: cross out the tens taken, and the ones taken when there are enough.
+  // When there aren't enough ones, the picture asks the child to break a ten first.
+  const takeTens = v.take_tens ?? 0
+  const takeOnes = (v.take_ones ?? 0) <= v.ones ? (v.take_ones ?? 0) : 0
+  return [{ tens: v.tens, ones: v.ones, takeTens, takeOnes }]
 })
+
+const tensOnes = (tens, ones) =>
+  `${tens} ${tens === 1 ? 'ten' : 'tens'} and ${ones} ${ones === 1 ? 'one' : 'ones'}`
 
 const label = computed(() => {
   const v = p.value
   switch (props.visual.type) {
     case 'objects':
+      if ('take' in v) return `${countOf(v.count, thing.value)}, ${v.take} crossed out`
       return 'count' in v
         ? countOf(v.count, thing.value)
         : `${countOf(v.first, thing.value)} and ${countOf(v.second, thing.value)} more`
     case 'ten-frame':
+      if (v.take) return `Ten-frames with ${v.filled} dots, ${v.take} crossed out`
       return `A ten-frame with ${v.filled} dots${v.extra ? ` and ${v.extra} more dots` : ''}`
     case 'number-line':
       return `A number line from ${numberLine.value[0].n} to ${numberLine.value.at(-1).n} with one empty box`
     case 'base-ten':
-      return groups.value.map((g) => `${g.tens} tens and ${g.ones} ones`).join(', plus ')
+      if ('take_tens' in v) {
+        return `${tensOnes(v.tens, v.ones)}. Take away ${tensOnes(v.take_tens, v.take_ones)}`
+      }
+      return groups.value.map((g) => tensOnes(g.tens, g.ones)).join(', plus ')
     default:
       return 'A picture'
   }
@@ -118,21 +135,25 @@ const label = computed(() => {
       <template v-for="(group, gi) in objectGroups" :key="gi">
         <span v-if="gi > 0" class="plus" aria-hidden="true">+</span>
         <span class="things" :class="objectGroups.length > 1 && (gi === 0 ? 'first' : 'second')">
-          <button
-            v-for="i in group"
-            :key="i"
-            type="button"
-            class="thing"
-            :class="{ counted: countNumber(i) }"
-            :aria-pressed="countNumber(i) ? 'true' : 'false'"
-            :aria-label="countNumber(i) ? `${thing.one}, number ${countNumber(i)}` : thing.one"
-            @click="tap(i, $event)"
-          >
-            <span class="emoji" aria-hidden="true">{{ thing.emoji }}</span>
-            <span v-if="countNumber(i)" class="count-badge" aria-hidden="true">
-              {{ countNumber(i) }}
+          <template v-for="i in group" :key="i">
+            <span v-if="taken(i)" class="thing taken" aria-hidden="true">
+              <span class="emoji">{{ thing.emoji }}</span>
             </span>
-          </button>
+            <button
+              v-else
+              type="button"
+              class="thing"
+              :class="{ counted: countNumber(i) }"
+              :aria-pressed="countNumber(i) ? 'true' : 'false'"
+              :aria-label="countNumber(i) ? `${thing.one}, number ${countNumber(i)}` : thing.one"
+              @click="tap(i, $event)"
+            >
+              <span class="emoji" aria-hidden="true">{{ thing.emoji }}</span>
+              <span v-if="countNumber(i)" class="count-badge" aria-hidden="true">
+                {{ countNumber(i) }}
+              </span>
+            </button>
+          </template>
         </span>
       </template>
     </div>
@@ -141,7 +162,7 @@ const label = computed(() => {
     <div v-else-if="visual.type === 'ten-frame'" class="frames">
       <div v-for="(cells, f) in frames" :key="f" class="frame">
         <span v-for="(cell, c) in cells" :key="c" class="cell" :class="cell">
-          <span v-if="cell === 'first' || cell === 'second'" class="dot" :class="cell" />
+          <span v-if="cell !== 'empty' && cell !== 'off'" class="dot" :class="cell" />
         </span>
       </div>
     </div>
@@ -159,9 +180,19 @@ const label = computed(() => {
       <template v-for="(g, gi) in groups" :key="gi">
         <span v-if="gi > 0" class="plus" aria-hidden="true">+</span>
         <span class="group">
-          <span v-for="i in range(g.tens)" :key="`t${i}`" class="rod" />
+          <span
+            v-for="i in range(g.tens)"
+            :key="`t${i}`"
+            class="rod"
+            :class="{ taken: i >= g.tens - (g.takeTens ?? 0) }"
+          />
           <span class="cubes">
-            <span v-for="i in range(g.ones)" :key="`o${i}`" class="cube" />
+            <span
+              v-for="i in range(g.ones)"
+              :key="`o${i}`"
+              class="cube"
+              :class="{ taken: i >= g.ones - (g.takeOnes ?? 0) }"
+            />
           </span>
         </span>
       </template>
@@ -269,6 +300,40 @@ const label = computed(() => {
       transform: scale(1.25);
     }
   }
+}
+
+/* Taken away: faded, with a cross over it. */
+.taken {
+  position: relative;
+  opacity: 0.45;
+}
+
+.taken::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(45deg, transparent 45%, var(--try) 45% 55%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, var(--try) 45% 55%, transparent 55%);
+}
+
+.thing.taken {
+  cursor: default;
+}
+
+/* A cross doesn't show on a thin ten-stick, so a taken stick is faded and outlined. */
+.rod.taken {
+  opacity: 0.3;
+  outline: 2px dashed var(--try);
+  outline-offset: 1px;
+}
+
+.rod.taken::after {
+  content: none;
+}
+
+.dot.taken {
+  background: var(--brand);
 }
 
 .dot {

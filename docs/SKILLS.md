@@ -9,7 +9,8 @@ You don't need to know how to program to review or add skills. They're plain tex
 ```
 backend/skills/
 ├── whole_numbers.yaml   counting, tens and ones
-└── addition.yaml        add within 10, make 10, add within 20, ...
+├── addition.yaml        add within 10, make 10, add within 20, ...
+└── subtraction.yaml     subtract within 10, subtract within 20, ...
 ```
 
 There is **one file per CBE sub-strand**. The files are in [YAML](https://yaml.org), a simple text format where indentation (spaces at the start of a line) matters.
@@ -46,7 +47,7 @@ skills:
 
 ## Adding or changing a skill
 
-1. Open the right file in `backend/skills/`, or create a new one for a new sub-strand, such as `subtraction.yaml`.
+1. Open the right file in `backend/skills/`, or create a new one for a new sub-strand, such as `money.yaml`.
 2. Add or edit a skill, copying the layout above. Keep the same indentation.
 3. Check your work:
    ```bash
@@ -54,7 +55,7 @@ skills:
    ```
    If everything is fine, you'll see the skills listed in teaching order:
    ```
-   Skill map OK: 9 skills, in teaching order:
+   Skill map OK: 14 skills, in teaching order:
 
      Grade 1  count-to-20                      needs: -
      Grade 1  add-within-10                    needs: count-to-20

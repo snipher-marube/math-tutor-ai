@@ -25,10 +25,13 @@ STEPS: tuple[HintStep, ...] = ("nudge", "picture", "worked-example")
 class Visual:
     """What the frontend should draw. `params` keys depend on `type`.
 
-    - objects:      count, or first and second (two groups to put together)
-    - ten-frame:    filled (dots shown), size (frame size, usually 10)
+    - objects:      count, or first and second (two groups to put together).
+                    With take: the last `take` of `count` are crossed out (take away).
+    - ten-frame:    filled (dots shown), size (frame size, usually 10).
+                    With take: the last `take` dots are crossed out.
     - number-line:  start, end (labels shown), blank (the position left empty for the child)
-    - base-ten:     tens, ones, or a_tens, a_ones, b_tens, b_ones for two numbers
+    - base-ten:     tens, ones, or a_tens, a_ones, b_tens, b_ones for two numbers.
+                    With take_tens and take_ones: that many are crossed out.
     """
 
     type: str
@@ -82,6 +85,25 @@ def _add_strategy(p: Problem) -> str:
     return "count-on"
 
 
+def _subtract_strategy(p: Problem) -> str:
+    a, b = p.operands
+    if a <= 10:
+        return "count-back"
+    if b < 10:
+        return "back-through-10"
+    if a % 10 == 0 and b % 10 == 0:
+        return "tens"
+    return "regroup" if a % 10 < b % 10 else "tens-and-ones"
+
+
+def _strategy(p: Problem) -> str | None:
+    if p.kind == "add":
+        return _add_strategy(p)
+    if p.kind == "subtract":
+        return _subtract_strategy(p)
+    return None
+
+
 # --- Step 1: nudge ----------------------------------------------------------------
 
 
@@ -101,6 +123,19 @@ def _nudge(p: Problem) -> str:
                     return "Add the tens together. Then add the ones together."
                 case _:
                     return "Add the ones first. If they make 10 or more, swap 10 ones for 1 ten."
+        case "subtract":
+            a, b = p.operands
+            match _subtract_strategy(p):
+                case "count-back":
+                    return f"Start at {a}. Count back {b}."
+                case "back-through-10":
+                    return f"Go back to 10 first. How many do you take from {a} to get to 10?"
+                case "tens":
+                    return f"Think in tens: {a // 10} tens take away {b // 10} tens."
+                case "tens-and-ones":
+                    return "Take away the tens. Then take away the ones."
+                case _:
+                    return "Are there enough ones to take away? If not, break 1 ten into 10 ones."
         case "missing-addend":
             a, target = p.operands
             return f"Start at {a}. Count up to {target}. How many jumps did you make?"
@@ -137,6 +172,15 @@ def _visual(p: Problem) -> Visual | None:
                         "base-ten",
                         {"a_tens": a // 10, "a_ones": a % 10, "b_tens": b // 10, "b_ones": b % 10},
                     )
+        case "subtract":
+            a, b = p.operands
+            match _subtract_strategy(p):
+                case "count-back":
+                    return Visual("objects", {"count": a, "take": b})
+                case "back-through-10":
+                    return Visual("ten-frame", {"filled": a, "size": 10, "take": b})
+                case _:
+                    return _take_away_blocks(a, b)
         case "missing-addend":
             a, target = p.operands
             return Visual("ten-frame", {"filled": a, "size": target})
@@ -157,6 +201,14 @@ def _visual(p: Problem) -> Visual | None:
     return None
 
 
+def _take_away_blocks(a: int, b: int) -> Visual:
+    """Base-ten blocks for `a`, with the tens and ones of `b` crossed out."""
+    return Visual(
+        "base-ten",
+        {"tens": a // 10, "ones": a % 10, "take_tens": b // 10, "take_ones": b % 10},
+    )
+
+
 def _picture_text(p: Problem) -> str:
     match p.kind:
         case "add":
@@ -169,6 +221,16 @@ def _picture_text(p: Problem) -> str:
                     return "Put the ones together. Can you make a new ten?"
                 case _:
                     return "Look at the tens and the ones. Add each kind together."
+        case "subtract":
+            match _subtract_strategy(p):
+                case "count-back":
+                    return "Cross out the ones we take away. Count the ones that are left."
+                case "back-through-10":
+                    return "Take away the dots outside the full ten first. Then take the rest."
+                case "regroup":
+                    return "There aren't enough cubes. Break one stick into 10 cubes."
+                case _:
+                    return "Take away the sticks, then the cubes. Count what is left."
         case "missing-addend":
             return "Count the empty boxes. That's how many more you need."
         case "count":
@@ -207,7 +269,7 @@ def _example_problem(problem: Problem, skill: Skill, rng: random.Random) -> Prob
         if (
             candidate.kind == problem.kind
             and candidate.answer != problem.answer
-            and (problem.kind != "add" or _add_strategy(candidate) == _add_strategy(problem))
+            and _strategy(candidate) == _strategy(problem)
         ):
             return candidate
     raise RuntimeError(f"Could not find a worked example for {problem}")
@@ -248,6 +310,42 @@ def _steps(p: Problem) -> tuple[str, ...]:
                         f"Ones: {a % 10} + {b % 10} = {ones}. That's 1 ten and {ones - 10} ones.",
                         f"Tens: {a // 10} + {b // 10} = {tens}, plus the new ten is {tens + 1}.",
                         f"{tens + 1} tens and {ones - 10} ones is {p.answer}.",
+                        _equals(p),
+                    )
+        case "subtract":
+            a, b = p.operands
+            match _subtract_strategy(p):
+                case "count-back":
+                    counted = ", ".join(str(n) for n in range(a - 1, a - b - 1, -1))
+                    return (f"Start at {a}.", f"Count back {b}: {counted}.", _equals(p))
+                case "back-through-10":
+                    to_ten = a - 10
+                    rest = b - to_ten
+                    return (
+                        f"Take {to_ten} from {a} to get to 10.",
+                        f"We need to take {b} in all, so {rest} more to take.",
+                        f"10 − {rest} = {p.answer}.",
+                        _equals(p),
+                    )
+                case "tens":
+                    tens = a // 10 - b // 10
+                    return (f"{a // 10} tens − {b // 10} tens = {tens} tens.", _equals(p))
+                case "tens-and-ones":
+                    tens, ones = a // 10 - b // 10, a % 10 - b % 10
+                    return (
+                        f"Tens: {a // 10} − {b // 10} = {tens} tens. That's {tens * 10}.",
+                        f"Ones: {a % 10} − {b % 10} = {ones}.",
+                        f"{tens * 10} + {ones} = {p.answer}.",
+                        _equals(p),
+                    )
+                case _:
+                    tens, ones = a // 10 - 1, a % 10 + 10
+                    return (
+                        f"Only {a % 10} ones, and we need to take {b % 10}. Not enough!",
+                        f"Break 1 ten into 10 ones: {tens} tens and {ones} ones.",
+                        f"Ones: {ones} − {b % 10} = {ones - b % 10}.",
+                        f"Tens: {tens} − {b // 10} = {tens - b // 10}.",
+                        f"{tens - b // 10} tens and {ones - b % 10} ones is {p.answer}.",
                         _equals(p),
                     )
         case "missing-addend":

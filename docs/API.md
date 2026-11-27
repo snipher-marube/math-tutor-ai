@@ -142,7 +142,7 @@ Delete the learner and **everything** stored about them. Returns `204`.
 
 ## Placement check
 
-A short adaptive check (at most 8 problems) that finds where a learner really is, so they start at the right level. See [PEDAGOGY.md](PEDAGOGY.md#2-teach-at-the-right-level-not-the-right-grade). No AI is used.
+A short adaptive check (at most 10 problems) that finds where a learner really is, so they start at the right level. See [PEDAGOGY.md](PEDAGOGY.md#2-teach-at-the-right-level-not-the-right-grade). No AI is used.
 
 ### `POST /api/learners/{id}/placement`
 Start a new check. Returns `201` and the first problem. Any unfinished check for this learner is left behind.
@@ -150,7 +150,7 @@ Start a new check. Returns `201` and the first problem. Any unfinished check for
 { "placement_id": 1, "finished": false, "message": "",
   "problem": { "id": "3f9c2a1b7d4e5f60", "skill_id": "make-10", "kind": "missing-addend",
                "question": "6 + ? = 10", "operands": [6, 10] },
-  "problem_number": 1, "max_problems": 8, "result": null }
+  "problem_number": 1, "max_problems": 10, "result": null }
 ```
 
 ### `POST /api/placement/{placement_id}/answer`
@@ -161,14 +161,14 @@ Answer the current problem. Returns the next problem in the same shape, or the r
 When finished, `problem` is `null` and `result` is set:
 ```json
 { "placement_id": 1, "finished": true, "message": "All done. Thank you! Now let's start learning.",
-  "problem": null, "problem_number": null, "max_problems": 8,
+  "problem": null, "problem_number": null, "max_problems": 10,
   "result": { "placement_id": 1, "finished_at": "2026-11-27T08:10:00+00:00",
               "stop_reason": "all-decided",
               "known_skills": ["add-within-10", "add-within-20", "count-to-100", "count-to-20", "make-10"],
               "next_skill": { "skill_id": "place-value-tens-ones", "name": "Tens and ones", "grade": 2,
                               "status": "not-started", "reason": "Ready to start: all the skills it needs are mastered." } } }
 ```
-- `stop_reason`: `all-decided`, `enough-problems` (reached 8), or `struggling` (stopped early after 3 wrong answers).
+- `stop_reason`: `all-decided`, `enough-problems` (reached 10), or `struggling` (stopped early after 3 wrong answers).
 - `known_skills` count as mastered for [`next-skill`](#get-apilearnersidnext-skill).
 
 Errors: `404` if the check doesn't exist, `409` if it is already finished or `problem_id` isn't the current, unanswered problem.
