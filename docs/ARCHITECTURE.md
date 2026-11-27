@@ -63,7 +63,8 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 
 | File | Responsibility |
 | --- | --- |
-| `main.py` | Creates the FastAPI app, configures CORS, registers routers, and serves `/` and `/health` |
+| `main.py` | Creates the FastAPI app, configures CORS, registers routers, serves `/health`, and serves the built web app at `/` |
+| `frontend.py` | Serves `frontend/dist` after the API routes, so the tutor runs as one process (`make start`) |
 | `config.py` | `Settings` class (pydantic-settings). Reads env vars and `.env` |
 | `routers/lesson.py` | HTTP layer for the teaching engine: `/api/lesson/*` (skills, problems, answers, hints) |
 | `routers/learners.py` | HTTP layer for learners: `/api/learners/*` (create, list, progress, next skill, reviews, reset, delete) |

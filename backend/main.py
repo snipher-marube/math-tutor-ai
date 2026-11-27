@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
+from frontend import has_build, serve_frontend
 from routers.learners import router as learners_router
 from routers.lesson import router as lesson_router
 from routers.placement import router as placement_router
@@ -28,11 +29,20 @@ app.include_router(placement_router)
 app.include_router(tutor_router)
 
 
-@app.get("/")
-async def root():
-    return {"status": "ok", "message": "math tutor AI is running"}
-
-
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+
+if not has_build(settings.FRONTEND_DIST):
+    # No built app yet: say so at `/`. Use Vite for development, or `make start`.
+    @app.get("/")
+    async def root():
+        return {
+            "status": "ok",
+            "message": "math tutor AI is running. Build the app with `make start` to use it here.",
+        }
+
+
+# Last, so every API route above is matched first.
+serve_frontend(app, settings.FRONTEND_DIST)

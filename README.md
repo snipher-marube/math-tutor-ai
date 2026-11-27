@@ -64,9 +64,15 @@ make setup
 # 3. Download the model (one-time, needs internet, ~1 GB)
 make model
 
-# 4. Run the backend and frontend (two terminals)
+# 4. Run the tutor (one process)
+make start       # http://localhost:8000  ← open this to try a lesson
+```
+
+Working on the code? Run the backend and frontend separately, so changes reload as you save:
+
+```bash
 make backend     # http://localhost:8000  (API docs at /docs)
-make frontend    # http://localhost:5173  ← open this to try a lesson
+make frontend    # http://localhost:5173  ← open this while developing
 ```
 
 Try a lesson problem (no AI needed):
@@ -95,6 +101,7 @@ No `make`? Platform-specific steps (including Windows) are in **[docs/SETUP.md](
 | --------------- | ------------------------------------ |
 | `make setup`    | Install all dependencies             |
 | `make model`    | Pull the default Ollama model        |
+| `make start`    | Build the app and run it as one process on :8000 |
 | `make backend`  | Run the API with auto-reload         |
 | `make frontend` | Run the web app                      |
 | `make test`     | Run backend tests (no model needed)  |

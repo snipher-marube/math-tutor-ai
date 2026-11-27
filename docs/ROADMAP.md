@@ -54,7 +54,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 ## v1.0: Deployable and proven
 - [ ] One-command install (Docker Compose and/or packaged installers)
 - [ ] Run on low-cost hardware (Raspberry Pi 5 / old laptops) and document the performance
-- [ ] Serve the built frontend from FastAPI, so there's only one process to run
+- [x] Serve the built frontend from FastAPI, so there's only one process to run (`make start`)
 - [ ] Field testing in real Grade 1–3 classrooms, with pre- and post-checks per skill
 
 Have an idea? Open a [feature request](https://github.com/snipher-marube/math-tutor-ai/issues/new/choose).

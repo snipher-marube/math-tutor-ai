@@ -55,6 +55,25 @@ npm run dev                # http://localhost:5173
 
 Open http://localhost:5173, make a learner card, and try a lesson. Vite sends `/api` requests to the backend on port 8000. If your backend runs elsewhere, start Vite with `VITE_API_TARGET=http://localhost:8001 npm run dev`.
 
+## Run the tutor as one app
+
+For a classroom or family device, you don't need two terminals. Build the web app once, and the backend serves it:
+
+```bash
+make start                 # builds the app, then http://localhost:8000
+```
+
+Without `make`:
+
+```bash
+cd frontend && npm run build
+cd ../backend && uv run fastapi run main.py --host 127.0.0.1 --port 8000
+```
+
+Open http://localhost:8000. After pulling new code, run `make start` again so the app is rebuilt.
+
+**Other devices:** the tutor only listens on this computer (`127.0.0.1`). There are no logins, so anyone who can reach it can see and reset learners' progress. Only use `--host 0.0.0.0` (for example, to let tablets in a classroom connect) on a network you trust, such as a school's own Wi-Fi with no internet guests.
+
 ## 6. Run the checks
 
 ```bash
