@@ -73,7 +73,7 @@ How the placement check works (`backend/services/placement.py`):
 - Two right answers mark the skill **and everything it needs** as known. One wrong answer marks the skill **and everything that builds on it** as not known yet.
 - It **stops early after 3 wrong answers**, so a child who is struggling isn't put off. They simply start at the beginning.
 - The child is **not told** whether each answer was right, and there are no hints. It's for finding the right level, not for marking.
-- Known skills count as **mastered**. A skill the check didn't decide is taught as usual: nothing is skipped by guessing.
+- Known skills count as **mastered**, and are reviewed the next day to confirm it. If the learner gets one wrong after the check, it goes back to the normal mastery rule. A skill the check didn't decide is taught as usual: nothing is skipped by guessing.
 - Teachers can **re-run** it at any time. The newest result replaces the one before. Placement problems don't count towards the mastery rule.
 
 ### 3. Concrete → Pictorial → Abstract (CPA)
@@ -133,7 +133,11 @@ The built rules, with their feedback, are in `backend/services/answer_checker.py
 ### 6. Short sessions, quick feedback, regular review
 - Sessions of **10–15 minutes**.
 - Feedback **immediately** after each answer.
-- **Spaced review:** skills already mastered come back every few days, so they aren't forgotten.
+- **Spaced review:** skills already mastered come back for one quick problem, at growing gaps, so they aren't forgotten (`backend/services/review.py`):
+  - Gaps of **1, 3, 7, 14, then 30 days**. Each day of right first answers in a row moves the skill to the next gap.
+  - A **wrong** first answer starts the gaps again from 1 day. A single slip keeps the skill mastered (4 of the last 5 still holds); more mistakes send it back to practising.
+  - Due reviews come **first** in a lesson, as a short warm-up, most overdue first. A skill is only reviewed while the skills it needs are still mastered.
+  - Skills from the placement check are first reviewed **the day after** the check.
 - **Praise effort and strategy** ("You kept trying!", "You used the number line!"), not ability ("You're so smart").
 
 ### 7. Built for children who can't read well yet

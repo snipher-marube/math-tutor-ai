@@ -38,7 +38,7 @@ A teaching engine written in code drives learning. The small AI model is a helpe
 | Problem generator | Creates problems for a skill. The correct answer is computed in code | Built: `services/problems.py` |
 | Answer checker | Marks answers and recognises common misconceptions | Built: `services/answer_checker.py` |
 | Hint ladder | Nudge, then picture, then worked example, then a new try | Built: `services/hints.py` |
-| Learner progress | Mastery per skill and review schedule, stored locally in SQLite | Built: `services/db.py`, `services/learners.py`, `services/mastery.py`. Review planned |
+| Learner progress | Mastery per skill and review schedule, stored locally in SQLite | Built: `services/db.py`, `services/learners.py`, `services/mastery.py`, `services/review.py` |
 | Lesson API | Next problem, submit answer, get hint | Built: `routers/lesson.py` ([API.md](API.md#lesson-api)) |
 | Language layer | The AI model writes word problems, re-explains, and encourages. It never decides correctness | Partly built: `services/ollama_client.py` |
 | Free-question mode | `POST /api/tutor/ask`: a secondary "ask a question" mode | Built |
@@ -66,7 +66,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 | `main.py` | Creates the FastAPI app, configures CORS, registers routers, and serves `/` and `/health` |
 | `config.py` | `Settings` class (pydantic-settings). Reads env vars and `.env` |
 | `routers/lesson.py` | HTTP layer for the teaching engine: `/api/lesson/*` (skills, problems, answers, hints) |
-| `routers/learners.py` | HTTP layer for learners: `/api/learners/*` (create, list, progress, reset, delete) |
+| `routers/learners.py` | HTTP layer for learners: `/api/learners/*` (create, list, progress, next skill, reviews, reset, delete) |
 | `routers/placement.py` | HTTP layer for the placement check: start, answer, latest result |
 | `dependencies.py` | Shared FastAPI dependencies (database, stores). Tests swap in a temporary database |
 | `routers/tutor.py` | HTTP layer for free questions: request validation, response models, and `/api/tutor/*` |
@@ -80,6 +80,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 | `services/problem_store.py` | Saves problems handed out and every answer, so answers are checked on the server |
 | `services/learners.py` | Learners (nickname and avatar only) and per-skill progress, with reset and delete |
 | `services/mastery.py` | The mastery rule and choosing a learner's next skill |
+| `services/review.py` | Spaced review: when each mastered skill should come back |
 | `services/placement.py` | The adaptive placement check: which skill to ask next, and when to stop |
 | `services/placement_store.py` | Saves placement checks and their results |
 | `skills/` | Skill map data files, one per CBE sub-strand ([SKILLS.md](SKILLS.md)) |
@@ -106,7 +107,6 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 
 ## Known limitations (v0.2)
 
-- No spaced review yet.
 - The lesson screen has no Kiswahili, rewards or component tests yet. Read-aloud needs an English voice installed on the device.
 - The verifier only checks questions written with symbols ("What is 14 + 5?"), not word problems.
 - Free questions have no conversation memory. Each question stands alone.

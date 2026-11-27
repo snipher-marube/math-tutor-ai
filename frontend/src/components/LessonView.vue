@@ -14,7 +14,8 @@ const props = defineProps({
 })
 const emit = defineEmits(['change-learner'])
 
-const skill = ref(null) // { skill_id, name, grade, status, reason }
+const skill = ref(null) // { skill_id, name, grade, status, review, reason }
+const learningSkill = ref(null) // the skill being learned, not counting reviews
 const problem = ref(null) // { id, kind, question, operands }
 const answer = ref('')
 const result = ref(null) // last answer result from the backend
@@ -38,21 +39,24 @@ async function nextProblem() {
   busy.value = true
   error.value = ''
   try {
-    const previous = skill.value?.skill_id
     const next = await api.nextSkill(props.learner.id)
     if (!next.skill_id) {
       allDone.value = true
       feedback.value = next.reason
       return
     }
-    newSkill.value = previous && previous !== next.skill_id ? next.name : ''
+    // A review is a quick visit to an old skill; coming back from it isn't a new skill.
+    const previous = learningSkill.value
+    newSkill.value = !next.review && previous && previous !== next.skill_id ? next.name : ''
+    if (!next.review) learningSkill.value = next.skill_id
     skill.value = next
     problem.value = await api.newProblem(next.skill_id, props.learner.id)
     answer.value = ''
     result.value = null
     hintStart.value = null
-    feedback.value = newSkill.value ? `New skill: ${newSkill.value}!` : ''
-    speak(newSkill.value ? `New skill! ${problem.value.question}` : problem.value.question)
+    const badge = next.review ? 'Quick review!' : newSkill.value ? 'New skill!' : ''
+    feedback.value = badge ? `${badge} ${next.name}` : ''
+    speak(badge ? `${badge} ${problem.value.question}` : problem.value.question)
   } catch (e) {
     error.value = e.message
   } finally {
@@ -123,7 +127,8 @@ onBeforeUnmount(stop)
 
     <template v-else-if="problem">
       <p class="skill">
-        <span v-if="newSkill" class="new-skill pop">New skill!</span>
+        <span v-if="skill.review" class="review-badge pop">Quick review</span>
+        <span v-else-if="newSkill" class="new-skill pop">New skill!</span>
         {{ skill.name }}
       </p>
 
@@ -238,6 +243,15 @@ onBeforeUnmount(stop)
   border-radius: 999px;
   background: var(--brand);
   color: var(--brand-text);
+}
+
+.review-badge {
+  display: inline-block;
+  margin-inline-end: 0.4rem;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  border: 2px solid var(--brand);
+  color: var(--brand);
 }
 
 .question {
