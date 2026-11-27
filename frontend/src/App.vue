@@ -1,6 +1,6 @@
 <script setup>
 // The app's screens: choose a learner, then (for a new learner) the placement
-// check, then the lesson. Teachers can re-run the check from the lesson screen.
+// check, then the lesson. Teachers can re-run the check from the learner screen.
 import { ref } from 'vue'
 import LearnerPicker from './components/LearnerPicker.vue'
 import LessonView from './components/LessonView.vue'
@@ -20,6 +20,13 @@ async function choose(chosen) {
   } catch (e) {
     error.value = e.message
   }
+}
+
+// From the teachers' and parents' section: re-run the placement check.
+function checkLevel(chosen) {
+  error.value = ''
+  learner.value = chosen
+  screen.value = 'placement'
 }
 
 function changeLearner() {
@@ -43,9 +50,8 @@ function changeLearner() {
       :key="`lesson-${learner.id}`"
       :learner="learner"
       @change-learner="changeLearner"
-      @check-level="screen = 'placement'"
     />
-    <LearnerPicker v-else @chosen="choose" />
+    <LearnerPicker v-else @chosen="choose" @check-level="checkLevel" />
   </main>
 </template>
 

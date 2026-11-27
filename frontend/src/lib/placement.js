@@ -3,7 +3,7 @@
 
 // A brand-new learner (no placement check yet, and nothing practised) takes the
 // check first, so they start at the right level. Everyone else goes straight to
-// the lesson. Teachers can still re-run the check from the lesson screen.
+// the lesson. Teachers can re-run the check from the learner screen.
 export async function needsPlacement(api, learnerId) {
   try {
     await api.latestPlacement(learnerId)
