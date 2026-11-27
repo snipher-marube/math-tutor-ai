@@ -3,6 +3,7 @@ import asyncio
 from ollama import AsyncClient, ResponseError
 
 from config import settings
+from services.prompts import load_prompt
 
 
 class TutorUnavailableError(Exception):
@@ -14,11 +15,8 @@ class TutorTimeoutError(Exception):
 
 
 async def generate_tutor_response(question: str, grade: int = 2) -> str:
-    system_prompt = (
-        f"You are a friendly math tutor for a Kenyan Grade {grade} student "
-        "using the CBE curriculum. Use simple English and real-life examples "
-        "like mangoes or shillings. Show your steps, then end with '= <answer>'."
-    )
+    # Teachers can edit the wording in backend/prompts/tutor_system.txt.
+    system_prompt = load_prompt("tutor_system", grade=grade)
 
     # Async client so a slow model reply doesn't block other requests.
     client = AsyncClient(host=settings.OLLAMA_BASE_URL)

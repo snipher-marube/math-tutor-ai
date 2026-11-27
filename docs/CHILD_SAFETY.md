@@ -13,7 +13,7 @@ Our users are Lower Primary learners (Grades 1–3), about **6–9 years old**. 
 
 ## Model behaviour
 
-- The system prompt must keep the tutor **on maths topics**, and it should redirect off-topic questions gently.
+- The system prompt (`backend/prompts/tutor_system.txt`) must keep the tutor **on maths topics**, and it should redirect off-topic questions gently.
 - The tutor must never ask for personal information (full name, school, location, phone number).
 - Treat model output as untrusted. Before shipping, check new prompts against tricky inputs: off-topic questions, rude messages, and attempts to make the tutor ignore its instructions.
 - Correctness matters. A confidently wrong answer teaches the wrong thing. Correct answers must be computed in code, and the model never decides whether a child's answer is right (see [PEDAGOGY.md](PEDAGOGY.md)).

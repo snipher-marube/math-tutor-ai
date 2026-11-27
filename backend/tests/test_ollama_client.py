@@ -31,6 +31,7 @@ class _FakeAsyncClient:
         _FakeAsyncClient.instances.append(self)
 
     async def chat(self, **kwargs):
+        self.messages = kwargs["messages"]
         if self._error:
             raise self._error
         await asyncio.sleep(self._delay)
@@ -119,3 +120,11 @@ def test_ask_returns_504_when_model_times_out(monkeypatch):
     res = TestClient(app).post("/api/tutor/ask", json={"question": "What is 1 + 1?"})
     assert res.status_code == 504
     assert "OLLAMA_TIMEOUT" in res.json()["detail"]
+
+
+def test_sends_the_prompt_file_for_the_learners_grade(monkeypatch):
+    _use_fake_client(monkeypatch)
+    asyncio.run(generate_tutor_response("What is 1 + 1?", grade=3))
+    system, user = _FakeAsyncClient.instances[0].messages
+    assert system["role"] == "system" and "Grade 3" in system["content"]
+    assert user == {"role": "user", "content": "What is 1 + 1?"}

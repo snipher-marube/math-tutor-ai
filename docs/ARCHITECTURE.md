@@ -71,7 +71,9 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 | `routers/placement.py` | HTTP layer for the placement check: start, answer, latest result |
 | `dependencies.py` | Shared FastAPI dependencies (database, stores). Tests swap in a temporary database |
 | `routers/tutor.py` | HTTP layer for free questions: request validation, response models, and `/api/tutor/*` |
-| `services/ollama_client.py` | Builds the system prompt and calls the local model through Ollama, with timeout and error handling |
+| `services/ollama_client.py` | Calls the local model through Ollama with the system prompt, with timeout and error handling |
+| `services/prompts.py` | Loads prompt files from `prompts/`: drops `#` note lines, fills `{grade}`, and rejects unknown placeholders |
+| `prompts/tutor_system.txt` | The tutor's instructions to the model. Plain text that teachers can edit |
 | `services/math_verifier.py` | Works out the answer to simple arithmetic questions in code and checks the model's answer |
 | `services/skill_map.py` | Loads and checks the skill map in `skills/*.yaml` |
 | `services/problems.py` | One problem generator per skill. Answers are computed in code |
@@ -93,7 +95,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 
 1. The frontend sends `POST /api/tutor/ask` with `{"question": "...", "grade": 2}`.
 2. `routers/tutor.py` validates the body and calls `generate_tutor_response()`.
-3. The service builds a CBE, Kenyan-context system prompt for the learner's grade and awaits `AsyncClient.chat()` on Ollama, so other requests keep being served while the model thinks.
+3. The service loads the system prompt from `prompts/tutor_system.txt` for the learner's grade and awaits `AsyncClient.chat()` on Ollama, so other requests keep being served while the model thinks.
 4. `math_verifier.verify()` checks the model's final answer against a calculation in code.
 5. The response contains the explanation plus the verification result.
 
@@ -111,5 +113,6 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 - The lesson screen has no Kiswahili or rewards yet. Read-aloud needs an English voice installed on the device.
 - The verifier only checks questions written with symbols ("What is 14 + 5?"), not word problems.
 - Free questions have no conversation memory. Each question stands alone.
+- Free questions are not yet kept on maths. Tested on `qwen2.5:1.5b`, the model doesn't reliably follow prompt rules about staying on topic or not asking personal questions, and stricter wording made it refuse real maths. A check in code, before the model is called, is planned.
 
 These are tracked in [ROADMAP.md](ROADMAP.md).
