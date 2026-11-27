@@ -5,6 +5,7 @@
 // question and decides when to stop (see backend/services/placement.py).
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { AVATARS, api } from '../lib/api.js'
+import { questionText } from '../lib/counting.js'
 import { releaseFocusAfterPointer } from '../lib/focus.js'
 import { readAloud, setReadAloud, speak, speechAvailable, stop, toSpeech } from '../lib/speech.js'
 import NumberPad from './NumberPad.vue'
@@ -28,6 +29,8 @@ const problem = computed(() => step.value?.problem ?? null)
 const result = computed(() => step.value?.result ?? null)
 
 // Counting problems need the objects on screen; the child counts them.
+const question = computed(() => questionText(problem.value))
+
 const problemVisual = computed(() =>
   problem.value?.kind === 'count'
     ? { type: 'objects', params: { count: problem.value.operands[0] } }
@@ -60,7 +63,7 @@ async function run(request) {
     } else {
       stage.value = 'questions'
       announce.value = next.message
-      speak(next.message ? `${next.message} ${next.problem.question}` : next.problem.question)
+      speak(next.message ? `${next.message} ${question.value}` : question.value)
     }
   } catch (e) {
     error.value = e.message
@@ -85,7 +88,7 @@ function retry() {
 }
 
 function sayQuestion() {
-  speak(problem.value.question, { force: true })
+  speak(question.value, { force: true })
 }
 
 onMounted(() => speak(`Hi ${props.learner.nickname}! ${INTRO}`))
@@ -147,8 +150,8 @@ onBeforeUnmount(stop)
       <p v-if="step.message" class="thanks pop" aria-hidden="true">{{ step.message }}</p>
 
       <div class="question-row">
-        <h1 class="question" :aria-label="`Question: ${toSpeech(problem.question)}`">
-          {{ problem.question }}
+        <h1 class="question" :aria-label="`Question: ${toSpeech(question)}`">
+          {{ question }}
         </h1>
         <button
           v-if="speechAvailable"
@@ -161,7 +164,12 @@ onBeforeUnmount(stop)
         </button>
       </div>
 
-      <ProblemVisual v-if="problemVisual" :visual="problemVisual" />
+      <ProblemVisual
+        v-if="problemVisual"
+        :key="problem.id"
+        :visual="problemVisual"
+        :seed="problem.id"
+      />
 
       <output class="answer" :class="{ empty: !answer }" aria-label="Your answer">
         {{ answer || '?' }}
