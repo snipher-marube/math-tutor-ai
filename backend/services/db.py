@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS learners (
@@ -46,6 +46,25 @@ CREATE TABLE IF NOT EXISTS attempts (
     created_at     TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS attempts_problem ON attempts(problem_id);
+
+-- Placement checks (added in schema version 2). Their problems are kept apart from
+-- normal practice, so they don't count towards the mastery rule.
+CREATE TABLE IF NOT EXISTS placements (
+    id            INTEGER PRIMARY KEY,
+    learner_id    INTEGER NOT NULL REFERENCES learners(id) ON DELETE CASCADE,
+    started_at    TEXT NOT NULL,
+    finished_at   TEXT,            -- NULL while the check is still running
+    stop_reason   TEXT,
+    known_skills  TEXT             -- JSON list of skill ids, set when finished
+);
+CREATE INDEX IF NOT EXISTS placements_learner ON placements(learner_id);
+
+CREATE TABLE IF NOT EXISTS placement_problems (
+    problem_id    TEXT PRIMARY KEY REFERENCES problems(id) ON DELETE CASCADE,
+    placement_id  INTEGER NOT NULL REFERENCES placements(id) ON DELETE CASCADE,
+    position      INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS placement_problems_placement ON placement_problems(placement_id);
 """
 
 

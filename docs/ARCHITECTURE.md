@@ -67,6 +67,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 | `config.py` | `Settings` class (pydantic-settings). Reads env vars and `.env` |
 | `routers/lesson.py` | HTTP layer for the teaching engine: `/api/lesson/*` (skills, problems, answers, hints) |
 | `routers/learners.py` | HTTP layer for learners: `/api/learners/*` (create, list, progress, reset, delete) |
+| `routers/placement.py` | HTTP layer for the placement check: start, answer, latest result |
 | `dependencies.py` | Shared FastAPI dependencies (database, stores). Tests swap in a temporary database |
 | `routers/tutor.py` | HTTP layer for free questions: request validation, response models, and `/api/tutor/*` |
 | `services/ollama_client.py` | Builds the system prompt and calls the local model through Ollama, with timeout and error handling |
@@ -75,10 +76,12 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 | `services/problems.py` | One problem generator per skill. Answers are computed in code |
 | `services/answer_checker.py` | Marks an answer and names the likely mistake, with child feedback and a hint step |
 | `services/hints.py` | Builds the hint ladder for a problem: nudge, picture (a visual for the frontend) and worked example |
-| `services/db.py` | The local SQLite database: one file, created on first start. Tables: `learners`, `problems`, `attempts` |
+| `services/db.py` | The local SQLite database: one file, created on first start. Tables: `learners`, `problems`, `attempts`, `placements`, `placement_problems` |
 | `services/problem_store.py` | Saves problems handed out and every answer, so answers are checked on the server |
 | `services/learners.py` | Learners (nickname and avatar only) and per-skill progress, with reset and delete |
 | `services/mastery.py` | The mastery rule and choosing a learner's next skill |
+| `services/placement.py` | The adaptive placement check: which skill to ask next, and when to stop |
+| `services/placement_store.py` | Saves placement checks and their results |
 | `skills/` | Skill map data files, one per CBE sub-strand ([SKILLS.md](SKILLS.md)) |
 | `tests/` | Pytest suite. The model is always faked |
 
@@ -103,7 +106,7 @@ Today the backend has two modes: the **lesson API** (the teaching engine, no AI)
 
 ## Known limitations (v0.2)
 
-- No placement check or spaced review yet. A new learner always starts at the first skill.
+- No spaced review yet. The placement check has an API but no screen yet.
 - The lesson screen has no Kiswahili, rewards or component tests yet. Read-aloud needs an English voice installed on the device.
 - The verifier only checks questions written with symbols ("What is 14 + 5?"), not word problems.
 - Free questions have no conversation memory. Each question stands alone.

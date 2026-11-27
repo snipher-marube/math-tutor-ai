@@ -8,6 +8,7 @@ from fastapi import Depends
 from config import settings
 from services.db import Database
 from services.learners import LearnerStore
+from services.placement_store import PlacementStore
 from services.problem_store import ProblemStore
 from services.skill_map import SkillMap, load_skill_map
 
@@ -32,6 +33,11 @@ def get_learner_store(db: Annotated[Database, Depends(get_db)]) -> LearnerStore:
     return LearnerStore(db)
 
 
+def get_placement_store(db: Annotated[Database, Depends(get_db)]) -> PlacementStore:
+    return PlacementStore(db)
+
+
 SkillMapDep = Annotated[SkillMap, Depends(get_skill_map)]
 ProblemStoreDep = Annotated[ProblemStore, Depends(get_problem_store)]
 LearnerStoreDep = Annotated[LearnerStore, Depends(get_learner_store)]
+PlacementStoreDep = Annotated[PlacementStore, Depends(get_placement_store)]
