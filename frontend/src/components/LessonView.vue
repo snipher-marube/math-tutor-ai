@@ -3,6 +3,7 @@
 // ask for hints, and move on. The answer is checked by the backend.
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { AVATARS, api } from '../lib/api.js'
+import { questionText } from '../lib/counting.js'
 import { releaseFocusAfterPointer } from '../lib/focus.js'
 import { readAloud, setReadAloud, speak, speechAvailable, stop, toSpeech } from '../lib/speech.js'
 import HintPanel from './HintPanel.vue'
@@ -29,6 +30,8 @@ const busy = ref(false)
 const solved = computed(() => result.value?.correct === true)
 
 // Counting problems need the objects on screen; the child counts them.
+const question = computed(() => questionText(problem.value))
+
 const problemVisual = computed(() =>
   problem.value?.kind === 'count'
     ? { type: 'objects', params: { count: problem.value.operands[0] } }
@@ -56,7 +59,7 @@ async function nextProblem() {
     hintStart.value = null
     const badge = next.review ? 'Quick review!' : newSkill.value ? 'New skill!' : ''
     feedback.value = badge ? `${badge} ${next.name}` : ''
-    speak(badge ? `${badge} ${problem.value.question}` : problem.value.question)
+    speak(badge ? `${badge} ${question.value}` : question.value)
   } catch (e) {
     error.value = e.message
   } finally {
@@ -85,7 +88,7 @@ function showHints() {
 }
 
 function sayQuestion() {
-  speak(problem.value.question, { force: true })
+  speak(question.value, { force: true })
 }
 
 onMounted(nextProblem)
@@ -133,8 +136,8 @@ onBeforeUnmount(stop)
       </p>
 
       <div class="question-row">
-        <h1 class="question" :aria-label="`Question: ${toSpeech(problem.question)}`">
-          {{ problem.question }}
+        <h1 class="question" :aria-label="`Question: ${toSpeech(question)}`">
+          {{ question }}
         </h1>
         <button
           v-if="speechAvailable"
@@ -147,7 +150,12 @@ onBeforeUnmount(stop)
         </button>
       </div>
 
-      <ProblemVisual v-if="problemVisual" :visual="problemVisual" />
+      <ProblemVisual
+        v-if="problemVisual"
+        :key="problem.id"
+        :visual="problemVisual"
+        :seed="problem.id"
+      />
 
       <output class="answer" :class="{ empty: !answer && !solved, solved }" aria-label="Your answer">
         {{ answer || '?' }}<span v-if="solved" aria-label="correct"> ✓</span>

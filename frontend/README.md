@@ -10,11 +10,12 @@ Vue 3 + Vite web app for learners: pick or create a nickname, then practise one 
 | `src/components/LessonView.vue` | One problem at a time: answer, feedback, hints, next problem |
 | `src/components/NumberPad.vue` | Big number buttons (laptop number keys, Backspace and Enter work too) |
 | `src/components/HintPanel.vue` | The hint ladder, one step at a time |
-| `src/components/ProblemVisual.vue` | Draws counters, ten-frames, number lines and tens-and-ones blocks |
+| `src/components/ProblemVisual.vue` | Draws emoji to count (tap each one to count it), ten-frames, number lines and tens-and-ones blocks |
 | `src/lib/api.js` | Calls the backend at `/api` |
 | `src/lib/speech.js` | Read-aloud: turns maths into words and speaks with an on-device voice |
 | `src/lib/focus.js` | Takes focus off a button after a mouse or touch click, so Enter always checks the answer |
 | `src/lib/placement.js` | Decides when a learner takes the placement check (new learners only) |
+| `src/lib/counting.js` | Picks the emoji to count (mangoes, goats, balls...) and names them in counting questions |
 
 ```bash
 npm ci

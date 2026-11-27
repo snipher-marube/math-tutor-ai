@@ -42,12 +42,13 @@ watch(shown, (n) => {
     <p v-if="error" role="alert">{{ error }}</p>
     <article v-for="hint in hints.slice(0, shown)" :key="hint.step" class="hint pop">
       <p class="hint-text">💡 {{ hint.text }}</p>
-      <ProblemVisual v-if="hint.visual" :visual="hint.visual" />
+      <ProblemVisual v-if="hint.visual" :visual="hint.visual" :seed="problemId" />
       <div v-if="hint.example" class="example">
         <p class="example-question">{{ hint.example.question }}</p>
         <ProblemVisual
           v-if="hint.example.kind === 'count'"
           :visual="{ type: 'objects', params: { count: hint.example.operands[0] } }"
+          :seed="`${problemId}-example`"
         />
         <ol>
           <li v-for="(step, i) in hint.example.steps" :key="i">{{ step }}</li>

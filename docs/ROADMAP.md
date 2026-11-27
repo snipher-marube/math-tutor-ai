@@ -30,7 +30,8 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 ## v0.4: Child-friendly app
 - [x] Replace the Vite starter page with the lesson screen: one problem, big number buttons, instant feedback
 - [x] Visual tools: counters, ten-frames, number line, base-ten blocks
-- [ ] Visual tools: Kenyan coins, and tapping or moving counters (not just looking)
+- [x] Friendly emoji to count (mangoes, goats, balls...), tapped one by one to count them
+- [ ] Visual tools: Kenyan coins, and moving counters (not just tapping)
 - [x] Hint ladder in the UI
 - [x] Frontend test setup (Vitest), with tests for read-aloud text and focus handling
 - [ ] 🟢 Component tests (Vue Test Utils) for the number pad, visuals and lesson flow

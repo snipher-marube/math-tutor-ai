@@ -1,15 +1,51 @@
 <script setup>
 // Draws a visual from the backend: { type, params }.
 // Types and params are described in backend/services/hints.py (Visual).
-import { computed } from 'vue'
+// Things to count are friendly emoji (mangoes, goats, balls...). A child can tap
+// each one to count it: it gets a number and the number is read aloud.
+import { computed, ref } from 'vue'
+import { countOf, pickThing } from '../lib/counting.js'
+import { releaseFocusAfterPointer } from '../lib/focus.js'
+import { speak } from '../lib/speech.js'
 
 const props = defineProps({
   visual: { type: Object, required: true },
+  // Picks which emoji to show, so a problem and its hints show the same thing.
+  seed: { type: String, default: '' },
 })
 
 const p = computed(() => props.visual.params)
 
 const range = (n) => Array.from({ length: Math.max(0, n) }, (_, i) => i)
+
+// --- Things to count -------------------------------------------------------------
+
+const thing = computed(() => pickThing(props.seed))
+
+// One group ("count") or two groups to put together ("first" + "second").
+// Indexes run on across both groups, so counting all of them works.
+const objectGroups = computed(() => {
+  const v = p.value
+  if ('count' in v) return [range(v.count)]
+  return [range(v.first), range(v.second).map((i) => v.first + i)]
+})
+
+const counted = ref([]) // indexes in the order they were tapped
+
+function countNumber(i) {
+  const at = counted.value.indexOf(i)
+  return at === -1 ? 0 : at + 1
+}
+
+function tap(i, event) {
+  releaseFocusAfterPointer(event)
+  if (counted.value.includes(i)) {
+    counted.value = counted.value.filter((x) => x !== i) // tap again to un-count
+  } else {
+    counted.value = [...counted.value, i]
+    speak(String(counted.value.length))
+  }
+}
 
 // Ten-frames: cells filled with the first group, then the second group ("extra").
 const frames = computed(() => {
@@ -57,8 +93,8 @@ const label = computed(() => {
   switch (props.visual.type) {
     case 'objects':
       return 'count' in v
-        ? `${v.count} counters`
-        : `${v.first} counters and ${v.second} more counters`
+        ? countOf(v.count, thing.value)
+        : `${countOf(v.first, thing.value)} and ${countOf(v.second, thing.value)} more`
     case 'ten-frame':
       return `A ten-frame with ${v.filled} dots${v.extra ? ` and ${v.extra} more dots` : ''}`
     case 'number-line':
@@ -72,19 +108,31 @@ const label = computed(() => {
 </script>
 
 <template>
-  <figure class="visual" role="img" :aria-label="label">
-    <!-- Counters -->
+  <figure
+    class="visual"
+    :role="visual.type === 'objects' ? 'group' : 'img'"
+    :aria-label="visual.type === 'objects' ? `${label}. Tap each one to count it.` : label"
+  >
+    <!-- Things to count: tap each one to count it -->
     <div v-if="visual.type === 'objects'" class="objects">
-      <template v-if="'count' in p">
-        <span v-for="i in range(p.count)" :key="i" class="dot first" />
-      </template>
-      <template v-else>
-        <span class="group">
-          <span v-for="i in range(p.first)" :key="i" class="dot first" />
-        </span>
-        <span class="plus" aria-hidden="true">+</span>
-        <span class="group">
-          <span v-for="i in range(p.second)" :key="i" class="dot second" />
+      <template v-for="(group, gi) in objectGroups" :key="gi">
+        <span v-if="gi > 0" class="plus" aria-hidden="true">+</span>
+        <span class="things" :class="objectGroups.length > 1 && (gi === 0 ? 'first' : 'second')">
+          <button
+            v-for="i in group"
+            :key="i"
+            type="button"
+            class="thing"
+            :class="{ counted: countNumber(i) }"
+            :aria-pressed="countNumber(i) ? 'true' : 'false'"
+            :aria-label="countNumber(i) ? `${thing.one}, number ${countNumber(i)}` : thing.one"
+            @click="tap(i, $event)"
+          >
+            <span class="emoji" aria-hidden="true">{{ thing.emoji }}</span>
+            <span v-if="countNumber(i)" class="count-badge" aria-hidden="true">
+              {{ countNumber(i) }}
+            </span>
+          </button>
         </span>
       </template>
     </div>
@@ -155,6 +203,72 @@ const label = computed(() => {
   font-size: 2rem;
   font-weight: 700;
   color: var(--muted);
+}
+
+.things {
+  display: grid;
+  grid-template-columns: repeat(5, auto); /* rows of five are easier to count */
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border-radius: 14px;
+}
+
+.things.first {
+  border: 2px dashed var(--brand);
+}
+
+.things.second {
+  border: 2px dashed var(--accent);
+}
+
+.thing {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+}
+
+.emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.thing.counted .emoji {
+  opacity: 0.55;
+}
+
+.count-badge {
+  position: absolute;
+  inset-block-start: -0.2rem;
+  inset-inline-end: -0.2rem;
+  display: grid;
+  place-items: center;
+  min-inline-size: 1.4rem;
+  block-size: 1.4rem;
+  padding-inline: 0.2rem;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--brand-text);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .thing.counted .emoji {
+    animation: bounce 0.3s ease-out;
+  }
+
+  @keyframes bounce {
+    50% {
+      transform: scale(1.25);
+    }
+  }
 }
 
 .dot {
