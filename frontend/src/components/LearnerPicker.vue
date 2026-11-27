@@ -4,7 +4,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { AVATARS, api } from '../lib/api.js'
 
-const emit = defineEmits(['chosen'])
+const emit = defineEmits(['chosen', 'check-level'])
 
 const learners = ref([])
 const loadError = ref('')
@@ -75,6 +75,26 @@ onMounted(load)
     <button v-if="!adding && !loadError" type="button" class="primary" @click="adding = true">
       I'm new here
     </button>
+
+    <!-- Kept closed and out of the lesson, so children don't open it by accident. -->
+    <details v-if="learners.length" class="grown-ups">
+      <summary>For teachers and parents</summary>
+      <p class="hint">
+        Run the placement check again to find where a learner should start. The new result
+        replaces the old one.
+      </p>
+      <ul>
+        <li v-for="learner in learners" :key="learner.id">
+          <span>
+            <span aria-hidden="true">{{ AVATARS[learner.avatar] ?? '🙂' }}</span>
+            {{ learner.nickname }}
+          </span>
+          <button type="button" @click="emit('check-level', learner)">
+            Check level<span class="visually-hidden"> for {{ learner.nickname }}</span>
+          </button>
+        </li>
+      </ul>
+    </details>
 
     <form v-if="adding" class="new" novalidate @submit.prevent="add">
       <h2>Make your learner card</h2>
@@ -217,6 +237,35 @@ onMounted(load)
   inset: 0;
   margin: 0;
   cursor: pointer;
+}
+
+.grown-ups {
+  inline-size: min(100%, 26rem);
+  margin-block-start: 1.5rem;
+  text-align: start;
+  color: var(--muted);
+}
+
+.grown-ups summary {
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+}
+
+.grown-ups ul {
+  display: grid;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.grown-ups li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text);
 }
 
 /* The picture is the visible control. Sibling selectors work in every browser. */

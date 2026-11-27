@@ -12,7 +12,7 @@ import ProblemVisual from './ProblemVisual.vue'
 const props = defineProps({
   learner: { type: Object, required: true },
 })
-const emit = defineEmits(['change-learner', 'check-level'])
+const emit = defineEmits(['change-learner'])
 
 const skill = ref(null) // { skill_id, name, grade, status, reason }
 const problem = ref(null) // { id, kind, question, operands }
@@ -104,7 +104,6 @@ onBeforeUnmount(stop)
         >
           <span aria-hidden="true">{{ readAloud ? '🔊' : '🔇' }}</span> Read aloud
         </button>
-        <button type="button" @click="emit('check-level')">Check level again</button>
         <button type="button" @click="emit('change-learner')">Change learner</button>
       </span>
     </header>

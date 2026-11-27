@@ -5,9 +5,9 @@ Vue 3 + Vite web app for learners: pick or create a nickname, then practise one 
 | File | What it does |
 | --- | --- |
 | `src/App.vue` | Choose a learner, then the placement check (new learners only), then the lesson |
-| `src/components/LearnerPicker.vue` | List learners, or make a learner card (nickname and animal) |
+| `src/components/LearnerPicker.vue` | List learners, or make a learner card (nickname and animal). "For teachers and parents" re-runs a learner's placement check |
 | `src/components/PlacementView.vue` | The placement check: a few questions to find where a new learner should start |
-| `src/components/LessonView.vue` | One problem at a time: answer, feedback, hints, next problem. "Check level again" re-runs the placement check |
+| `src/components/LessonView.vue` | One problem at a time: answer, feedback, hints, next problem |
 | `src/components/NumberPad.vue` | Big number buttons (laptop number keys, Backspace and Enter work too) |
 | `src/components/HintPanel.vue` | The hint ladder, one step at a time |
 | `src/components/ProblemVisual.vue` | Draws counters, ten-frames, number lines and tens-and-ones blocks |
