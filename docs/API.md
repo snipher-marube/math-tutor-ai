@@ -114,14 +114,25 @@ Totals and mastery for each skill the learner has practised, most recent first.
 - `recent_total`, `recent_correct` and `correct_days` show the numbers behind `status`, using first answers only.
 
 ### `GET /api/learners/{id}/next-skill`
-The skill this learner should work on next: the first skill in teaching order that isn't mastered yet and whose prerequisites are all mastered.
+The skill this learner should work on next. A **due review** comes first (one problem; see [spaced review](PEDAGOGY.md#6-short-sessions-quick-feedback-regular-review)). Otherwise it is the first skill in teaching order that isn't mastered yet and whose prerequisites are all mastered.
 ```json
 { "skill_id": "add-within-10", "name": "Add within 10", "grade": 1,
-  "status": "not-started", "reason": "Ready to start: all the skills it needs are mastered." }
+  "status": "not-started", "review": false,
+  "reason": "Ready to start: all the skills it needs are mastered." }
 ```
+- `review`: `true` for a quick review of a mastered skill that is due. Ask for a problem for that skill as usual; once it is answered, the review is done.
 A new learner gets the first skill (`count-to-20`). When every skill is mastered, `skill_id` is `null` and `reason` says so.
 
-A learner's latest [placement check](#placement-check) also counts: the skills it found known are treated as mastered.
+A learner's latest [placement check](#placement-check) also counts: the skills it found known are treated as mastered, until the learner gets one of them wrong on the first try after the check.
+
+### `GET /api/learners/{id}/reviews`
+The review schedule for each mastered skill, soonest first. For teachers and parents.
+```json
+[{ "skill_id": "count-to-20", "name": "Count objects to 20",
+   "last_seen": "2026-11-05", "streak_days": 3, "due_on": "2026-11-12", "due": false }]
+```
+- `last_seen`: the local day the skill was last answered (or placed by the check).
+- `streak_days`: days with right first answers in a row. The gap after `last_seen` is 1, 3, 7, 14 or 30 days.
 
 ### `DELETE /api/learners/{id}/progress`
 Delete all of the learner's problems, answers and placement checks, but keep the learner. Returns `204`.

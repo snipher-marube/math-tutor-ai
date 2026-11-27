@@ -23,7 +23,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] Learners and progress stored locally (SQLite), with view, reset and delete
 - [x] Mastery rules, and choosing each learner's next skill
 - [x] Placement check to find each learner's starting level
-- [ ] Spaced review of mastered skills
+- [x] Spaced review of mastered skills
 - [ ] 🟢 Add subtraction skills and misconceptions
 - [ ] 🟢 Add skills for other sub-strands (money, time, shapes, ...)
 

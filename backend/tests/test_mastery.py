@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import services.problem_store as problem_store_module
+import services.review as review_module
 from main import app
 from services.mastery import FirstAnswer, next_skill, skill_mastery
 from services.problem_store import ProblemStore
@@ -156,9 +157,12 @@ client = TestClient(app)
 
 @pytest.fixture
 def clock(monkeypatch):
-    """Control the time answers are saved at."""
+    """Control the time answers are saved at, and what day reviews think it is."""
     current = {"now": DAY1}
     monkeypatch.setattr(problem_store_module, "now", lambda: current["now"])
+    monkeypatch.setattr(
+        review_module, "today", lambda tz: review_module.local_day(current["now"], tz)
+    )
     return current
 
 
@@ -201,6 +205,7 @@ def test_full_journey_to_mastery_and_the_next_skill(db, clock):
         "name": "Add within 10",
         "grade": 1,
         "status": "not-started",
+        "review": False,
         "reason": "Ready to start: all the skills it needs are mastered.",
     }
 

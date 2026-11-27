@@ -6,6 +6,8 @@ progress, which suits a shared family or classroom device. See docs/CHILD_SAFETY
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import date
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException, Response
@@ -13,17 +15,21 @@ from pydantic import BaseModel, Field, StringConstraints
 
 from config import settings
 from dependencies import LearnerStoreDep, PlacementStoreDep, SkillMapDep
+from services import review
 from services.learners import AVATARS, Learner, LearnerStore, NicknameTakenError
 from services.mastery import (
     RECENT_PROBLEMS,
     REQUIRED_CORRECT,
     REQUIRED_DAYS,
+    FirstAnswer,
     SkillMastery,
     Status,
     next_skill,
     skill_mastery,
 )
 from services.placement_store import PlacementStore
+from services.problems import has_generator
+from services.review import GAPS_DAYS, ReviewPlan, review_plans
 from services.skill_map import SkillMap
 
 router = APIRouter(prefix="/api/learners", tags=["learners"])
@@ -80,7 +86,26 @@ class NextSkillOut(BaseModel):
     name: str | None
     grade: int | None
     status: Status | None
+    review: bool = Field(
+        default=False, description="True for a quick review of a mastered skill that is due"
+    )
     reason: str = Field(description="Why this skill, for teachers and parents")
+
+
+REVIEW_RULE = (
+    "Mastered skills come back for one quick problem after "
+    + ", then ".join(f"{d}" for d in GAPS_DAYS)
+    + " days. A wrong first answer starts again from 1 day."
+)
+
+
+class ReviewOut(BaseModel):
+    skill_id: str
+    name: str
+    last_seen: date = Field(description="Local day the skill was last answered, or placed")
+    streak_days: int = Field(description="Days in a row (of practice) with right first answers")
+    due_on: date
+    due: bool = Field(description=REVIEW_RULE)
 
 
 def _out(learner: Learner) -> LearnerOut:
@@ -94,15 +119,51 @@ def _mastery(store: LearnerStore, learner_id: int) -> dict[str, SkillMastery]:
     }
 
 
+@dataclass(frozen=True)
+class _Learning:
+    answers: dict[str, list[FirstAnswer]]  # first answers to practice problems, by skill
+    statuses: dict[str, Status]
+    placed: dict[str, str]  # skills trusted from the placement check -> when it finished
+
+
+def _learning(store: LearnerStore, placements: PlacementStore, learner_id: int) -> _Learning:
+    """Everything the mastery and review rules need about one learner.
+
+    Skills the latest placement check found known count as mastered, until the
+    learner gets one of them wrong (first try) after the check. From then on, the
+    normal mastery rule decides, as for any other skill.
+    """
+    answers = store.first_answers(learner_id)
+    statuses = {sid: skill_mastery(a, settings.TIMEZONE).status for sid, a in answers.items()}
+    placed: dict[str, str] = {}
+    placement = placements.latest_finished(learner_id)
+    if placement is not None and placement.finished_at is not None:
+        for sid in placement.known_skills:
+            after = [a for a in answers.get(sid, []) if a.answered_at >= placement.finished_at]
+            if all(a.correct for a in after):
+                statuses[sid] = "mastered"
+                placed[sid] = placement.finished_at
+    return _Learning(answers, statuses, placed)
+
+
 def learner_statuses(
     store: LearnerStore, placements: PlacementStore, learner_id: int
 ) -> dict[str, Status]:
-    """Each skill's status from practice, plus skills the latest placement check found known."""
-    statuses = {skill_id: m.status for skill_id, m in _mastery(store, learner_id).items()}
-    placement = placements.latest_finished(learner_id)
-    for skill_id in placement.known_skills if placement else ():
-        statuses[skill_id] = "mastered"
-    return statuses
+    """Each skill's status from practice and the latest placement check."""
+    return _learning(store, placements, learner_id).statuses
+
+
+def _plans(learning: _Learning, skill_map: SkillMap) -> list[ReviewPlan]:
+    plans = review_plans(
+        skill_map, learning.statuses, learning.answers, settings.TIMEZONE, learning.placed
+    )
+    return [p for p in plans if has_generator(p.skill_id)]
+
+
+def _review_reason(plan: ReviewPlan, today: date) -> str:
+    days = (today - plan.last_seen).days
+    when = "yesterday" if days == 1 else f"{days} days ago"
+    return f"Quick review: last seen {when}, so it stays strong."
 
 
 def next_skill_out(skill_map: SkillMap, statuses: dict[str, Status]) -> NextSkillOut:
@@ -183,7 +244,43 @@ def get_next_skill(
     count as mastered. A new learner with no placement check starts at the first skill.
     """
     _get_or_404(store, learner_id)
-    return next_skill_out(skill_map, learner_statuses(store, placements, learner_id))
+    learning = _learning(store, placements, learner_id)
+    today = review.today(settings.TIMEZONE)
+    due = [p for p in _plans(learning, skill_map) if p.is_due(today)]
+    if due:
+        skill = skill_map.get(due[0].skill_id)
+        return NextSkillOut(
+            skill_id=skill.id,
+            name=skill.name,
+            grade=skill.grade,
+            status="mastered",
+            review=True,
+            reason=_review_reason(due[0], today),
+        )
+    return next_skill_out(skill_map, learning.statuses)
+
+
+@router.get("/{learner_id}/reviews", response_model=list[ReviewOut])
+def get_reviews(
+    learner_id: int,
+    store: LearnerStoreDep,
+    placements: PlacementStoreDep,
+    skill_map: SkillMapDep,
+) -> list[ReviewOut]:
+    """The review schedule for every mastered skill, soonest first. For teachers and parents."""
+    _get_or_404(store, learner_id)
+    today = review.today(settings.TIMEZONE)
+    return [
+        ReviewOut(
+            skill_id=p.skill_id,
+            name=skill_map.get(p.skill_id).name,
+            last_seen=p.last_seen,
+            streak_days=p.streak_days,
+            due_on=p.due_on,
+            due=p.is_due(today),
+        )
+        for p in _plans(_learning(store, placements, learner_id), skill_map)
+    ]
 
 
 @router.delete("/{learner_id}/progress", status_code=204)
