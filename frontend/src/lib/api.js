@@ -34,6 +34,11 @@ export const api = {
     request('POST', '/lesson/problems', { skill_id: skillId, learner_id: learnerId }),
   answer: (problemId, answer) =>
     request('POST', `/lesson/problems/${problemId}/answer`, { answer }),
+  progress: (learnerId) => request('GET', `/learners/${learnerId}/progress`),
+  startPlacement: (learnerId) => request('POST', `/learners/${learnerId}/placement`),
+  answerPlacement: (placementId, problemId, answer) =>
+    request('POST', `/placement/${placementId}/answer`, { problem_id: problemId, answer }),
+  latestPlacement: (learnerId) => request('GET', `/learners/${learnerId}/placement`),
   hints: (problemId, start) =>
     request('GET', `/lesson/problems/${problemId}/hints?start=${encodeURIComponent(start)}`),
 }
