@@ -33,6 +33,9 @@ def _expected_answer(p: Problem) -> int:
     match p.kind:
         case "add":
             return sum(p.operands)
+        case "subtract":
+            a, b = p.operands
+            return a - b
         case "missing-addend":
             a, target = p.operands
             return target - a
@@ -122,6 +125,40 @@ def test_with_regrouping_means_ones_add_to_10_or_more():
         a, b = p.operands
         assert 10 <= a <= 99 and 10 <= b <= 99
         assert a % 10 + b % 10 >= 10
+
+
+def test_subtract_within_10_always_leaves_something():
+    for p in _many("subtract-within-10"):
+        a, b = p.operands
+        assert p.kind == "subtract" and 1 <= b < a <= 10
+
+
+def test_subtract_within_20_goes_back_through_10():
+    for p in _many("subtract-within-20"):
+        a, b = p.operands
+        assert 11 <= a <= 18 and b <= 9
+        assert b > a % 10, p  # more than the ones, so it crosses 10
+        assert p.answer < 10
+
+
+def test_subtract_tens_only_uses_whole_tens():
+    for p in _many("subtract-tens"):
+        assert all(n % 10 == 0 for n in p.operands) and p.answer > 0
+
+
+def test_subtract_no_regrouping_has_enough_ones():
+    for p in _many("subtract-within-100-no-regrouping"):
+        a, b = p.operands
+        assert 10 <= b < a <= 99
+        assert b % 10 <= a % 10
+        assert a % 10 != 0  # otherwise it's the "subtract tens" skill
+
+
+def test_subtract_with_regrouping_needs_a_ten_broken():
+    for p in _many("subtract-within-100-with-regrouping"):
+        a, b = p.operands
+        assert 10 <= b < a <= 99
+        assert a % 10 < b % 10
 
 
 def test_place_value_covers_all_question_types():

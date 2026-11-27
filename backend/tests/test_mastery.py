@@ -126,7 +126,10 @@ def test_keeps_practising_an_unmastered_skill():
 
 
 def test_follows_teaching_order_across_sub_strands():
-    done = {s: "mastered" for s in ["count-to-20", "add-within-10", "make-10", "add-within-20"]}
+    addition = ["count-to-20", "add-within-10", "make-10", "add-within-20"]
+    done = {s: "mastered" for s in addition}
+    assert next_skill(SKILL_MAP, done).skill.id == "subtract-within-10"
+    done |= {"subtract-within-10": "mastered", "subtract-within-20": "mastered"}
     assert next_skill(SKILL_MAP, done).skill.id == "count-to-100"
 
 

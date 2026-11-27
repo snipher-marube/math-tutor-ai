@@ -36,6 +36,16 @@ def _mistake(problem: Problem, given: int) -> str | None:
         (_p("add", (6, 3), 9), 8, "counted-start"),
         (_p("add", (6, 3), 9), 10, "counted-extra"),
         (_p("add", (30, 40), 70), 7, "added-all-digits"),  # tens treated as ones
+        # Subtraction
+        (_p("subtract", (52, 17), 35), 45, "smaller-from-larger"),
+        (_p("subtract", (13, 5), 8), 12, "smaller-from-larger"),
+        (_p("subtract", (53, 17), 36), 46, "forgot-to-take-ten"),
+        (_p("subtract", (9, 4), 5), 13, "added-instead"),
+        (_p("subtract", (58, 23), 35), 53, "reversed-digits"),
+        (_p("subtract", (7, 3), 4), 5, "counted-back-start"),
+        (_p("subtract", (7, 3), 4), 3, "counted-back-extra"),
+        (_p("subtract", (8, 3), 5), 3, "gave-amount-taken"),
+        (_p("subtract", (70, 30), 40), 100, "added-instead"),
         # Make 10 (missing addend)
         (_p("missing-addend", (4, 10), 6), 14, "missing-added-instead"),
         (_p("missing-addend", (4, 10), 6), 10, "missing-gave-total"),
@@ -70,6 +80,8 @@ def test_recognises_mistake(problem, given, expected):
         (_p("add", (58, 18), 76), 75),  # a slip in a big sum, not counting on
         (_p("add", (40, 10), 50), 51),
         (_p("missing-addend", (4, 10), 6), 9),
+        (_p("subtract", (58, 23), 35), 34),  # a slip in a big number, not counting back
+        (_p("subtract", (54, 14), 40), 4),
     ],
 )
 def test_unknown_mistakes_have_no_misconception(problem, given):

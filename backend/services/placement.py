@@ -30,7 +30,7 @@ from typing import Literal
 
 from services.skill_map import SkillMap
 
-MAX_PROBLEMS = 8  # never more than this many problems
+MAX_PROBLEMS = 10  # never more than this many problems
 MAX_WRONG = 3  # stop early after this many wrong answers
 RIGHT_TO_KNOW = 2  # right answers in a row that show a skill is known
 

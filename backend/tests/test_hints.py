@@ -108,8 +108,49 @@ def test_same_seed_gives_same_ladder():
         (Problem("add-within-10", "add", "", (2, 7), 9), "Start at 7. Count on 2 more."),
         (Problem("make-10", "missing-addend", "", (4, 10), 6), "Start at 4. Count up to 10."),
         (Problem("count-to-100", "number-after", "", (39,), 40), "Say 39, then count up"),
+        (Problem("subtract-within-10", "subtract", "", (7, 3), 4), "Start at 7. Count back 3."),
+        (
+            Problem("subtract-within-20", "subtract", "", (13, 5), 8),
+            "Go back to 10 first. How many do you take from 13",
+        ),
+        (
+            Problem("subtract-tens", "subtract", "", (70, 30), 40),
+            "Think in tens: 7 tens take away 3 tens.",
+        ),
+        (
+            Problem("subtract-within-100-with-regrouping", "subtract", "", (52, 17), 35),
+            "Are there enough ones",
+        ),
     ],
 )
 def test_nudges_use_the_problems_own_numbers(problem, nudge):
     skill = SKILL_MAP.get(problem.skill_id)
     assert hint_ladder(problem, skill, random.Random(1))[0].text.startswith(nudge)
+
+
+def test_subtraction_worked_example_for_regrouping():
+    problem = Problem(
+        "subtract-within-100-with-regrouping", "subtract", "52 − 17 = ?", (52, 17), 35
+    )
+    skill = SKILL_MAP.get(problem.skill_id)
+    example = hint_ladder(problem, skill, random.Random(3))[-1].example
+    a, b = example.problem.operands
+    assert a % 10 < b % 10  # the example needs a ten broken too
+    assert example.problem.answer != 35
+    assert "Break 1 ten into 10 ones" in example.steps[1]
+    assert example.steps[-1] == f"So {a} − {b} = {a - b}."
+
+
+def test_take_away_pictures():
+    def visual(skill_id, a, b):
+        problem = Problem(skill_id, "subtract", "", (a, b), a - b)
+        return hint_ladder(problem, SKILL_MAP.get(skill_id), random.Random(1))[1].visual
+
+    assert visual("subtract-within-10", 7, 3).params == {"count": 7, "take": 3}
+    assert visual("subtract-within-20", 13, 5).params == {"filled": 13, "size": 10, "take": 5}
+    assert visual("subtract-within-100-with-regrouping", 52, 17).params == {
+        "tens": 5,
+        "ones": 2,
+        "take_tens": 1,
+        "take_ones": 7,
+    }

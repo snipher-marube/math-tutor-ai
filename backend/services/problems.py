@@ -21,7 +21,7 @@ from services.skill_map import Skill, SkillMap, load_skill_map
 @dataclass(frozen=True)
 class Problem:
     skill_id: str
-    kind: str  # what type of problem this is, e.g. "add" or "missing-addend"
+    kind: str  # what type of problem this is, e.g. "add", "subtract" or "missing-addend"
     question: str  # short, read-aloud friendly text
     operands: tuple[int, ...]  # the numbers in the problem, for visuals and mistake checks
     answer: int
@@ -62,6 +62,11 @@ def skills_without_generators(skill_map: SkillMap) -> list[str]:
 
 def _add(skill: Skill, a: int, b: int) -> Problem:
     return Problem(skill.id, "add", f"{a} + {b} = ?", (a, b), a + b)
+
+
+def _subtract(skill: Skill, a: int, b: int) -> Problem:
+    # "−" is the real minus sign; read-aloud says "minus".
+    return Problem(skill.id, "subtract", f"{a} − {b} = ?", (a, b), a - b)
 
 
 # --- Whole numbers --------------------------------------------------------------
@@ -156,6 +161,52 @@ def _add_within_100_with_regrouping(skill: Skill, rng: random.Random) -> Problem
     a_tens = rng.randint(1, max_tens - 1)
     b_tens = rng.randint(1, max_tens - a_tens)
     return _add(skill, a_tens * 10 + a_ones, b_tens * 10 + b_ones)
+
+
+# --- Subtraction ----------------------------------------------------------------
+
+
+@generator("subtract-within-10")
+def _subtract_within_10(skill: Skill, rng: random.Random) -> Problem:
+    a = rng.randint(2, skill.numbers.max)
+    b = rng.randint(1, a - 1)  # something is left, so the answer is never 0
+    return _subtract(skill, a, b)
+
+
+@generator("subtract-within-20")
+def _subtract_within_20(skill: Skill, rng: random.Random) -> Problem:
+    # A teen number take away a single digit, going back through 10 (13 − 5 = 8):
+    # the number taken away is more than the teen number's ones.
+    a = rng.randint(11, min(18, skill.numbers.max))
+    b = rng.randint(a % 10 + 1, 9)
+    return _subtract(skill, a, b)
+
+
+@generator("subtract-tens")
+def _subtract_tens(skill: Skill, rng: random.Random) -> Problem:
+    a_tens = rng.randint(2, min(9, skill.numbers.max // 10))
+    b_tens = rng.randint(1, a_tens - 1)
+    return _subtract(skill, a_tens * 10, b_tens * 10)
+
+
+@generator("subtract-within-100-no-regrouping")
+def _subtract_within_100_no_regrouping(skill: Skill, rng: random.Random) -> Problem:
+    # Two 2-digit numbers with enough ones to take away (58 − 23).
+    a_tens = rng.randint(2, 9)
+    b_tens = rng.randint(1, a_tens - 1)
+    a_ones = rng.randint(1, 9)  # at least 1, or it would be the "subtract tens" skill
+    b_ones = rng.randint(0, a_ones)
+    return _subtract(skill, a_tens * 10 + a_ones, b_tens * 10 + b_ones)
+
+
+@generator("subtract-within-100-with-regrouping")
+def _subtract_within_100_with_regrouping(skill: Skill, rng: random.Random) -> Problem:
+    # Not enough ones (52 − 17), so 1 ten must be broken into 10 ones.
+    a_tens = rng.randint(2, 9)
+    b_tens = rng.randint(1, a_tens - 1)
+    a_ones = rng.randint(0, 8)
+    b_ones = rng.randint(a_ones + 1, 9)
+    return _subtract(skill, a_tens * 10 + a_ones, b_tens * 10 + b_ones)
 
 
 def main() -> int:
