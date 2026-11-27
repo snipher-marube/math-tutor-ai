@@ -180,6 +180,68 @@ ADDED_TENS_AND_ONES = Misconception(
         "Adds the number of tens and ones (3 tens and 4 ones = 7). Revisit that a ten is worth 10."
     ),
 )
+SMALLER_FROM_LARGER = Misconception(
+    id="smaller-from-larger",
+    feedback="There aren't enough ones to take away. Let's break 1 ten into 10 ones first.",
+    hint="picture",
+    teacher_note=(
+        "Takes the smaller ones digit from the bigger one (52 − 17 = 45). "
+        "Practise breaking a ten with base-ten blocks."
+    ),
+)
+FORGOT_TO_TAKE_TEN = Misconception(
+    id="forgot-to-take-ten",
+    feedback="You broke a ten into ones. Now there is one ten less. Let's fix the tens.",
+    hint="picture",
+    teacher_note=(
+        "Regroups the ones but doesn't take the ten from the tens (53 − 17 = 46). "
+        "Show the broken ten leaving the tens column."
+    ),
+)
+ADDED_INSTEAD = Misconception(
+    id="added-instead",
+    feedback="That's what we get when we add. This time we take away. Let's look again.",
+    hint="picture",
+    teacher_note="Adds instead of subtracting (9 − 4 = 13). Revisit what '−' means.",
+)
+COUNTED_BACK_START = Misconception(
+    id="counted-back-start",
+    feedback="So close! Start on the first number, then count back one jump at a time.",
+    hint="picture",
+    teacher_note=(
+        "One more than the answer: counts the starting number when counting back "
+        "(7 − 3 = 5 from '7, 6, 5'). Use a number line."
+    ),
+)
+COUNTED_BACK_EXTRA = Misconception(
+    id="counted-back-extra",
+    feedback="So close! Let's count back again carefully, one jump for each one we take.",
+    hint="picture",
+    teacher_note="One less than the answer: takes away one too many when counting back.",
+)
+GAVE_AMOUNT_TAKEN = Misconception(
+    id="gave-amount-taken",
+    feedback="That's how many we took away. How many are left?",
+    hint="picture",
+    teacher_note="Gives the number taken away instead of what is left (8 − 3 answered 3).",
+)
+
+
+def _digits(n: int) -> tuple[int, int]:
+    """Tens and ones."""
+    return divmod(n, 10)
+
+
+def _smaller_from_larger(p: Problem, g: int) -> bool:
+    """52 − 17 = 45: in the ones, takes 2 from 7 instead of 7 from 2."""
+    (ta, oa), (tb, ob) = _digits(p.operands[0]), _digits(p.operands[1])
+    return p.operands[0] >= 10 and oa < ob and g == (ta - tb) * 10 + (ob - oa)
+
+
+def _forgot_to_take_ten(p: Problem, g: int) -> bool:
+    """53 − 17 = 46: does 13 − 7 in the ones, but keeps all 5 tens."""
+    (ta, oa), (tb, ob) = _digits(p.operands[0]), _digits(p.operands[1])
+    return p.operands[0] >= 20 and oa < ob and g == (ta - tb) * 10 + (10 + oa - ob)
 
 
 def _counting_sized(p: Problem) -> bool:
@@ -226,6 +288,15 @@ RULES: dict[str, list[Rule]] = {
         (REVERSED_DIGITS, lambda p, g: g == _reversed_digits(p.answer)),
         (COUNTED_START, _off_by_one_under),
         (COUNTED_EXTRA, _off_by_one_over),
+    ],
+    "subtract": [
+        (SMALLER_FROM_LARGER, _smaller_from_larger),
+        (FORGOT_TO_TAKE_TEN, _forgot_to_take_ten),
+        (ADDED_INSTEAD, lambda p, g: g == sum(p.operands)),
+        (REVERSED_DIGITS, lambda p, g: g == _reversed_digits(p.answer)),
+        (COUNTED_BACK_START, lambda p, g: p.operands[0] <= 10 and g == p.answer + 1),
+        (COUNTED_BACK_EXTRA, lambda p, g: p.operands[0] <= 10 and g == p.answer - 1),
+        (GAVE_AMOUNT_TAKEN, lambda p, g: g == p.operands[1]),
     ],
     "missing-addend": [
         (MISSING_ADDED_INSTEAD, lambda p, g: g == sum(p.operands)),

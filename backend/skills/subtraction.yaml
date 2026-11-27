@@ -1,0 +1,67 @@
+# Skills for the CBE sub-strand "Subtraction" (strand: Numbers).
+# Skills are listed in the order they are usually taught.
+# How to read and edit this file: see docs/SKILLS.md
+
+strand: numbers
+substrand: subtraction
+
+skills:
+  - id: subtract-within-10
+    name: Subtract within 10
+    grade: 1
+    requires: [add-within-10]
+    numbers: { min: 0, max: 10 }
+    description: >
+      Take some away from a small group and find how many are left,
+      first by crossing out objects, then by counting back.
+    examples:
+      - Achieng has 7 mangoes. She eats 3. How many mangoes are left?
+      - 9 − 4 = ?
+
+  - id: subtract-within-20
+    name: Subtract within 20
+    grade: 1
+    requires: [subtract-within-10, add-within-20]
+    numbers: { min: 0, max: 20 }
+    description: >
+      Subtract a single-digit number from a teen number, going back through 10
+      (13 − 5: take 3 to get to 10, then take 2 more to get 8).
+    examples:
+      - 14 − 6 = ?
+      - Mutua has 12 sweets and gives away 5. How many sweets does he have left?
+
+  - id: subtract-tens
+    name: Subtract tens
+    grade: 2
+    requires: [place-value-tens-ones, subtract-within-10]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Subtract whole tens, using the fact that 7 tens − 3 tens = 4 tens,
+      so 70 − 30 = 40.
+    examples:
+      - 80 − 50 = ?
+      - Wanjiku has KSh 60 and spends KSh 20. How much money is left?
+
+  - id: subtract-within-100-no-regrouping
+    name: Subtract within 100 without regrouping
+    grade: 2
+    requires: [subtract-within-20, subtract-tens]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Subtract two-digit numbers where there are enough ones to take away,
+      taking away the tens and the ones separately (58 − 23 = 35).
+    examples:
+      - 58 − 23 = ?
+      - 76 − 41 = ?
+
+  - id: subtract-within-100-with-regrouping
+    name: Subtract within 100 with regrouping
+    grade: 2
+    requires: [subtract-within-100-no-regrouping]
+    numbers: { min: 0, max: 100 }
+    description: >
+      Subtract two-digit numbers where there aren't enough ones, breaking
+      1 ten into 10 ones first (52 − 17 = 35).
+    examples:
+      - 52 − 17 = ?
+      - Chebet has 43 marbles and loses 18. How many marbles does she have now?

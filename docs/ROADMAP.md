@@ -24,7 +24,7 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] Mastery rules, and choosing each learner's next skill
 - [x] Placement check to find each learner's starting level
 - [x] Spaced review of mastered skills
-- [ ] 🟢 Add subtraction skills and misconceptions
+- [x] Subtraction skills (Grades 1–2), misconceptions, hints and take-away pictures
 - [ ] 🟢 Add skills for other sub-strands (money, time, shapes, ...)
 
 ## v0.4: Child-friendly app
