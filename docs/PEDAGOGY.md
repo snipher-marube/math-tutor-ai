@@ -60,12 +60,21 @@ A child moves to the next skill only after **showing mastery**. The rule, simple
 - **Only the first answer to each problem counts.** Getting it right after a hint or a second try is good learning, but it doesn't show mastery yet.
 - **Two different days** shows the skill has stuck, not just been remembered for one session. Days are counted in **local time** (`TIMEZONE`, `Africa/Nairobi` by default).
 - **Only the latest 5 problems count**, so if a child starts getting a skill wrong again, it goes back to *practising*.
-- The tutor then offers the **next skill**: the first one in teaching order that isn't mastered yet and whose prerequisites all are. A new learner starts at the first skill. A placement check is planned, so that learners can start at their real level.
+- The tutor then offers the **next skill**: the first one in teaching order that isn't mastered yet and whose prerequisites all are. Skills the latest placement check found known count as mastered too. A new learner who hasn't done the check starts at the first skill.
 
 Mastery is per skill, not per grade. The rule is in `backend/services/mastery.py`.
 
 ### 2. Teach at the right level, not the right grade
 Many Grade 3 learners are still working at a Grade 1 level in maths. A short, friendly **placement check** finds where each child really is, and the engine starts them there. This is the idea behind **Teaching at the Right Level (TaRL)**, one of the best-evidenced approaches in education research, used widely in Kenya and across Africa.
+
+How the placement check works (`backend/services/placement.py`):
+
+- It is **short**: at most 8 problems. It asks about a skill near the middle of the skill map, then moves **up** after two right answers in a row, or **down** after one wrong answer.
+- Two right answers mark the skill **and everything it needs** as known. One wrong answer marks the skill **and everything that builds on it** as not known yet.
+- It **stops early after 3 wrong answers**, so a child who is struggling isn't put off. They simply start at the beginning.
+- The child is **not told** whether each answer was right, and there are no hints. It's for finding the right level, not for marking.
+- Known skills count as **mastered**. A skill the check didn't decide is taught as usual: nothing is skipped by guessing.
+- Teachers can **re-run** it at any time. The newest result replaces the one before. Placement problems don't count towards the mastery rule.
 
 ### 3. Concrete → Pictorial → Abstract (CPA)
 Show maths before writing it:

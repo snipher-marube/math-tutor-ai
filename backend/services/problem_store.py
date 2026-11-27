@@ -31,7 +31,10 @@ class ProblemStore:
     def __init__(self, db: Database):
         self._db = db
 
-    def add(self, problem: Problem, learner_id: int | None = None) -> StoredProblem:
+    def add(
+        self, problem: Problem, learner_id: int | None = None, placement_id: int | None = None
+    ) -> StoredProblem:
+        """Save a new problem. With `placement_id`, it is part of that placement check."""
         problem_id = secrets.token_hex(8)
         seed = random.randrange(2**32)
         with self._db.connect() as conn:
@@ -51,6 +54,13 @@ class ProblemStore:
                     now(),
                 ),
             )
+            if placement_id is not None:
+                conn.execute(
+                    """INSERT INTO placement_problems (problem_id, placement_id, position)
+                       VALUES (?, ?, (SELECT COUNT(*) + 1 FROM placement_problems
+                                      WHERE placement_id = ?))""",
+                    (problem_id, placement_id, placement_id),
+                )
         return StoredProblem(problem_id, problem, seed, learner_id, 0, False, ())
 
     def get(self, problem_id: str) -> StoredProblem | None:

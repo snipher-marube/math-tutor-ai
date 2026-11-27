@@ -12,7 +12,7 @@ from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, Field, StringConstraints
 
 from config import settings
-from dependencies import LearnerStoreDep, SkillMapDep
+from dependencies import LearnerStoreDep, PlacementStoreDep, SkillMapDep
 from services.learners import AVATARS, Learner, LearnerStore, NicknameTakenError
 from services.mastery import (
     RECENT_PROBLEMS,
@@ -23,6 +23,8 @@ from services.mastery import (
     next_skill,
     skill_mastery,
 )
+from services.placement_store import PlacementStore
+from services.skill_map import SkillMap
 
 router = APIRouter(prefix="/api/learners", tags=["learners"])
 
@@ -92,6 +94,28 @@ def _mastery(store: LearnerStore, learner_id: int) -> dict[str, SkillMastery]:
     }
 
 
+def learner_statuses(
+    store: LearnerStore, placements: PlacementStore, learner_id: int
+) -> dict[str, Status]:
+    """Each skill's status from practice, plus skills the latest placement check found known."""
+    statuses = {skill_id: m.status for skill_id, m in _mastery(store, learner_id).items()}
+    placement = placements.latest_finished(learner_id)
+    for skill_id in placement.known_skills if placement else ():
+        statuses[skill_id] = "mastered"
+    return statuses
+
+
+def next_skill_out(skill_map: SkillMap, statuses: dict[str, Status]) -> NextSkillOut:
+    nxt = next_skill(skill_map, statuses)
+    return NextSkillOut(
+        skill_id=nxt.skill.id if nxt.skill else None,
+        name=nxt.skill.name if nxt.skill else None,
+        grade=nxt.skill.grade if nxt.skill else None,
+        status=nxt.status,
+        reason=nxt.reason,
+    )
+
+
 def _get_or_404(store: LearnerStore, learner_id: int) -> Learner:
     learner = store.get(learner_id)
     if learner is None:
@@ -146,27 +170,25 @@ def get_progress(learner_id: int, store: LearnerStoreDep) -> list[SkillProgressO
 
 
 @router.get("/{learner_id}/next-skill", response_model=NextSkillOut)
-def get_next_skill(learner_id: int, store: LearnerStoreDep, skill_map: SkillMapDep) -> NextSkillOut:
+def get_next_skill(
+    learner_id: int,
+    store: LearnerStoreDep,
+    placements: PlacementStoreDep,
+    skill_map: SkillMapDep,
+) -> NextSkillOut:
     """The skill this learner should work on next.
 
     The first skill in teaching order that isn't mastered yet and whose
-    prerequisites are all mastered. A new learner starts at the first skill.
+    prerequisites are all mastered. Skills the latest placement check found known
+    count as mastered. A new learner with no placement check starts at the first skill.
     """
     _get_or_404(store, learner_id)
-    statuses = {skill_id: m.status for skill_id, m in _mastery(store, learner_id).items()}
-    nxt = next_skill(skill_map, statuses)
-    return NextSkillOut(
-        skill_id=nxt.skill.id if nxt.skill else None,
-        name=nxt.skill.name if nxt.skill else None,
-        grade=nxt.skill.grade if nxt.skill else None,
-        status=nxt.status,
-        reason=nxt.reason,
-    )
+    return next_skill_out(skill_map, learner_statuses(store, placements, learner_id))
 
 
 @router.delete("/{learner_id}/progress", status_code=204)
 def reset_progress(learner_id: int, store: LearnerStoreDep) -> Response:
-    """Delete all of a learner's problems and answers, but keep the learner."""
+    """Delete all of a learner's problems, answers and placement checks, but keep the learner."""
     _get_or_404(store, learner_id)
     store.reset_progress(learner_id)
     return Response(status_code=204)

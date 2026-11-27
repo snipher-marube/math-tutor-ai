@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from routers.learners import router as learners_router
 from routers.lesson import router as lesson_router
+from routers.placement import router as placement_router
 from routers.tutor import router as tutor_router
 
 app = FastAPI(
@@ -23,6 +24,7 @@ app.add_middleware(
 
 app.include_router(learners_router)
 app.include_router(lesson_router)
+app.include_router(placement_router)
 app.include_router(tutor_router)
 
 

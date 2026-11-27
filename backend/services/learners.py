@@ -13,12 +13,15 @@ from dataclasses import dataclass
 from services.db import Database, now
 from services.mastery import FirstAnswer
 
-# The first answer to each of a learner's problems.
-FIRST_ANSWERS_SQL = """
+# Placement-check problems don't count as practice.
+NOT_PLACEMENT = "p.id NOT IN (SELECT problem_id FROM placement_problems)"
+
+# The first answer to each of a learner's practice problems.
+FIRST_ANSWERS_SQL = f"""
     SELECT p.skill_id, a.correct, a.created_at
     FROM problems p
     JOIN attempts a ON a.id = (SELECT MIN(id) FROM attempts WHERE problem_id = p.id)
-    WHERE p.learner_id = ?
+    WHERE p.learner_id = ? AND {NOT_PLACEMENT}
 """
 
 AVATARS = ("lion", "elephant", "giraffe", "zebra", "cheetah", "rhino", "hippo", "monkey")
@@ -78,21 +81,22 @@ class LearnerStore:
         return cur.rowcount > 0
 
     def reset_progress(self, learner_id: int) -> None:
-        """Remove all problems and answers, but keep the learner."""
+        """Remove all problems, answers and placement checks, but keep the learner."""
         with self._db.connect() as conn:
             conn.execute("DELETE FROM problems WHERE learner_id = ?", (learner_id,))
+            conn.execute("DELETE FROM placements WHERE learner_id = ?", (learner_id,))
 
     def progress(self, learner_id: int) -> list[SkillProgress]:
-        """Per-skill totals for skills the learner has practised."""
+        """Per-skill totals for skills the learner has practised (not placement checks)."""
         with self._db.connect() as conn:
             rows = conn.execute(
-                """SELECT p.skill_id,
+                f"""SELECT p.skill_id,
                           COUNT(DISTINCT p.id)             AS problems,
                           COUNT(a.id)                      AS attempts,
                           COALESCE(SUM(a.correct), 0)      AS correct,
                           MAX(COALESCE(a.created_at, p.created_at)) AS last_practised
                    FROM problems p LEFT JOIN attempts a ON a.problem_id = p.id
-                   WHERE p.learner_id = ?
+                   WHERE p.learner_id = ? AND {NOT_PLACEMENT}
                    GROUP BY p.skill_id
                    ORDER BY last_practised DESC""",
                 (learner_id,),
