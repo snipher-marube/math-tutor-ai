@@ -12,7 +12,8 @@ The plan follows [PEDAGOGY.md](PEDAGOGY.md): a **teaching engine** (written in c
 - [x] 🟢 Backend: configurable `OLLAMA_TIMEOUT` that returns a friendly `504`
 - [x] 🟢 Validate input: limit question length and reject empty strings
 - [x] Document the teaching approach ([PEDAGOGY.md](PEDAGOGY.md)) and widen scope to Grades 1–3
-- [ ] Move the system prompt into its own file (`backend/prompts/`) so non-developers can edit it
+- [x] Move the system prompt into its own file (`backend/prompts/tutor_system.txt`) so non-developers can edit it
+- [ ] Keep free questions on maths in code: questions with no numbers get a friendly redirect without calling the model, and replies are kept short
 
 ## v0.3: Teaching engine (no AI needed)
 - [x] Skill map format (data files) with prerequisites, plus the first skills: Grade 1–2 addition ([SKILLS.md](SKILLS.md))
